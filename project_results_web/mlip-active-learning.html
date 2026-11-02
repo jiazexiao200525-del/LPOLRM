@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LRM/非晶Li3PO4界面中机器学习势预优化、主动学习采样与DFT验收的讨论展示。">
+  <title>机器学习势与主动学习 | LRM × Li₃PO₄</title>
+  <style>
+    :root{--ink:#192d37;--muted:#60737d;--line:#d9e3e5;--paper:#f4f7f6;--white:#fff;--teal:#087f78;--teal-soft:#dff2ee;--rust:#b64f30;--rust-soft:#fae9df;--blue:#375f86;--blue-soft:#e5eef5;--lime:#d4df73;--dark:#14353b;--radius:6px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Aptos","Segoe UI","Microsoft YaHei",sans-serif;line-height:1.7}a{color:inherit}button{font:inherit}.wrap{width:min(1120px,calc(100% - 44px));margin:0 auto}.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 max(22px,calc((100vw - 1120px)/2));min-height:64px;background:rgba(244,247,246,.96);border-bottom:1px solid var(--line)}.brand{font-size:12px;font-weight:800;text-decoration:none;letter-spacing:.04em}.brand span{color:var(--teal)}.nav{display:flex;align-items:center;gap:19px;font-size:12px;font-weight:700}.nav a{text-decoration:none;color:var(--muted)}.nav a:hover{color:var(--teal)}.back{padding:8px 11px;border:1px solid var(--line);border-radius:var(--radius);background:white;text-decoration:none;font-size:11px;font-weight:700;white-space:nowrap}.hero{padding:60px 0 42px}.eyebrow{margin:0 0 10px;color:var(--teal);font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}.hero-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(240px,.65fr);gap:42px;align-items:end}.hero h1{max-width:760px;margin:0;color:var(--dark);font-size:clamp(32px,4.2vw,52px);line-height:1.17;font-weight:800}.hero-lead{max-width:760px;margin:20px 0 0;color:var(--muted);font-size:16px}.hero-stamp{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;padding:17px 18px;border-left:3px solid var(--rust);background:#fff}.hero-stamp b{font-size:13px}.hero-stamp p{margin:8px 0;color:var(--muted);font-size:12px}.hero-stamp small{color:#798c93;font-size:10px}.experiment{background:var(--dark);color:#eff7f4}.experiment-inner{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:22px;min-height:106px}.exp-label{display:block;color:#a8c5c0;font-size:10px;font-weight:800;letter-spacing:.1em}.experiment strong{display:block;margin-top:5px;font-size:14px}.exp-values{color:#d7e68b}.arrow{color:var(--lime);font-size:26px}.section{padding:62px 0}.section.alt{background:#eaf0ef}.section.dark{background:var(--dark);color:#f4f8f7}.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:30px}.section-head h2{margin:0;font-size:28px;line-height:1.25;color:var(--dark)}.dark .section-head h2{color:#f4f8f7}.section-intro{max-width:470px;margin:0;color:var(--muted);font-size:13px}.dark .section-intro{color:#b3c4c4}.step-label{color:var(--rust);font-size:10px;font-weight:800;letter-spacing:.12em}.logic{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.logic article{padding:22px 22px 22px 0}.logic article+article{padding-left:22px;border-left:1px solid var(--line)}.logic h3{margin:9px 0;font-size:16px}.logic p{margin:0;color:var(--muted);font-size:12px}.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.status-card{padding:19px;border:1px solid var(--line);border-top:3px solid var(--teal);background:var(--white);border-radius:var(--radius)}.status-card.warn{border-top-color:var(--rust)}.status-card h3{margin:0 0 8px;font-size:14px}.status-card p{margin:0;color:var(--muted);font-size:12px}.status-card .metric{display:block;margin:5px 0 8px;color:var(--dark);font-size:23px;font-weight:800}.status-card small{display:block;margin-top:10px;color:#77878c;font-size:10px}.definition{display:grid;grid-template-columns:.8fr 1.2fr;gap:48px;align-items:start}.definition h2{margin:0 0 13px;color:var(--dark);font-size:27px;line-height:1.28}.definition>div>p{color:var(--muted);font-size:13px}.contrast{border-top:1px solid var(--line)}.contrast-row{display:grid;grid-template-columns:145px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);font-size:12px}.contrast-row b{color:var(--teal)}.contrast-row span{color:var(--muted)}.route-table{width:100%;border-collapse:collapse;background:#fff;font-size:12px}.route-table th,.route-table td{padding:13px;border:1px solid var(--line);text-align:left;vertical-align:top}.route-table th{background:#dfe9e7;color:var(--dark)}.route-table td:first-child{min-width:175px;font-weight:800}.route-table td{color:var(--muted)}.route-table strong{color:var(--ink)}.flow-wrap{overflow-x:auto;padding:14px 0 8px}.flow{display:grid;grid-template-columns:repeat(5,minmax(145px,1fr));min-width:810px;align-items:stretch}.flow-step{position:relative;padding:15px 14px;background:#fff;border-top:3px solid var(--teal);border-bottom:1px solid var(--line)}.flow-step:nth-child(2),.flow-step:nth-child(4){border-top-color:var(--rust)}.flow-step+.flow-step{margin-left:18px}.flow-step+.flow-step:before{content:"→";position:absolute;left:-18px;top:33px;width:18px;text-align:center;color:var(--rust);font-weight:900}.flow-step small{color:var(--teal);font-size:9px;font-weight:800;letter-spacing:.09em}.flow-step h3{margin:7px 0;font-size:13px}.flow-step p{margin:0;color:var(--muted);font-size:11px}.note{margin-top:20px;padding:15px 17px;border-left:3px solid var(--rust);background:var(--rust-soft);color:#693a2b;font-size:12px}.note strong{color:#542c20}.one-structure{display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:start}.sampling-list{margin:0;padding:0;list-style:none;counter-reset:item}.sampling-list li{counter-increment:item;display:grid;grid-template-columns:33px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}.sampling-list li:before{content:"0" counter(item);color:var(--rust);font-size:11px;font-weight:900}.sampling-list b{font-size:13px}.sampling-list p{margin:3px 0 0;color:var(--muted);font-size:11px}.truth-panel{padding:20px;background:var(--dark);color:white;border-radius:var(--radius)}.truth-panel h3{margin:0 0 12px;font-size:15px}.truth-panel p{margin:9px 0;color:#bed0ce;font-size:12px}.truth-panel b{color:#e0ec94}.gate{display:grid;grid-template-columns:repeat(4,1fr);gap:0}.gate article{padding:18px;border-top:3px solid var(--teal);border-bottom:1px solid var(--line);background:white}.gate article+article{margin-left:10px}.gate article:nth-child(2){border-top-color:var(--blue)}.gate article:nth-child(3){border-top-color:var(--rust)}.gate article:nth-child(4){border-top-color:#9c8b39}.gate small{font-size:9px;color:var(--muted);font-weight:800;letter-spacing:.1em}.gate h3{margin:8px 0;font-size:13px}.gate p{margin:0;color:var(--muted);font-size:11px}.decision{display:grid;grid-template-columns:1fr 1fr;gap:15px}.decision article{padding:22px;background:rgba(255,255,255,.06);border-top:2px solid var(--teal)}.decision article:last-child{border-top-color:var(--rust)}.decision h3{margin:0 0 9px;font-size:16px}.decision p{margin:0;color:#bdcecc;font-size:12px}.discussion{margin-top:27px;padding:18px 20px;border:1px solid rgba(231,240,237,.2);font-size:13px}.discussion b{color:var(--lime)}.footer{padding:20px 0;border-top:1px solid var(--line);background:#fff;color:var(--muted);font-size:10px}.footer-inner{display:flex;justify-content:space-between;gap:20px}.footer a{color:var(--teal);font-weight:700;text-decoration:none}
+    .sources{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.sources a{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid rgba(231,240,237,.25);border-radius:var(--radius);color:#e7f0ed;text-decoration:none;font-size:11px}.sources a:hover{border-color:var(--lime);color:var(--lime)}
+    @media(max-width:820px){.nav{gap:11px;font-size:10px}.hero-grid,.definition,.one-structure{grid-template-columns:1fr}.hero-stamp{max-width:none}.section-head{display:block}.section-intro{margin-top:10px}.gate{grid-template-columns:1fr 1fr;gap:10px}.gate article+article{margin-left:0}.status-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:580px){.wrap{width:calc(100% - 30px)}.topbar{padding:8px 15px;min-height:56px;flex-wrap:wrap}.brand{font-size:10px}.nav{order:3;width:100%;overflow-x:auto;justify-content:flex-start;padding:2px 0 5px}.nav a{white-space:nowrap}.back{font-size:10px}.hero{padding:38px 0 30px}.hero h1{font-size:34px}.hero-lead{font-size:14px}.experiment-inner{grid-template-columns:1fr auto 1fr;gap:9px;min-height:95px}.experiment strong{font-size:11px}.exp-label{font-size:8px}.arrow{font-size:19px}.section{padding:43px 0}.section-head h2,.definition h2{font-size:23px}.logic,.status-grid,.decision{grid-template-columns:1fr}.logic article{padding:16px 0}.logic article+article{padding-left:0;border-left:0;border-top:1px solid var(--line)}.contrast-row{grid-template-columns:115px 1fr}.route-table{min-width:720px}.route-scroll{overflow-x:auto}.gate{grid-template-columns:1fr 1fr}.gate article{padding:13px}.footer-inner{display:block}.footer-inner span{display:block;margin-top:5px}}
+    @media print{.topbar{position:static}.back{display:none}.section{padding:32px 0}.section,.status-card,.truth-panel,.decision article{break-inside:avoid}.flow-wrap,.route-scroll{overflow:visible}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">INTERFACE LAB <span>/</span> LRM × Li₃PO₄</a>
+    <nav class="nav" aria-label="讨论页目录">
+      <a href="#starting-point">出发点</a><a href="#mlip">ML势</a><a href="#active-learning">主动学习</a><a href="#single">单结构采样</a><a href="#decision">实施决策</a>
+    </nav>
+    <a class="back" href="mlip-execution-plan.html">查看详细执行方案</a>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow">METHOD DISCUSSION / 2026.10</p>
+      <div class="hero-grid">
+        <div>
+          <h1>如何用机器学习势，<br>更可靠地优化 LRM / 非晶 Li₃PO₄ 界面？</h1>
+          <p class="hero-lead">本页讨论一条具体路线：机器学习势负责探索和优化几何，DFT负责校验结构并计算电荷密度、DOS/PDOS与结合能。重点是解释主动学习如何嵌入当前“只有一个界面起始结构”的工作流。</p>
+        </div>
+        <aside class="hero-stamp"><div><b>讨论边界</b><p>当前只有一个 288 原子界面起点。优化轨迹可以提供局部构型，但不能代表多个独立非晶界面或全局最低能结构。</p></div><small>基于截至 2026.10.27 的项目记录整理；不代表新增计算结果</small></aside>
+      </div>
+    </section>
+
+    <section class="experiment">
+      <div class="wrap experiment-inner">
+        <div><span class="exp-label">实验现象</span><strong>ALD-Li₃PO₄ 包覆后</strong></div><div class="arrow" aria-hidden="true">→</div>
+        <div><span class="exp-label">计算要回答</span><strong class="exp-values">几何可信度与局部界面机制</strong></div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="starting-point">
+      <div class="section-head"><div><p class="eyebrow">01 / STARTING POINT</p><h2>从实验问题到计算瓶颈</h2></div><p class="section-intro">逻辑起点不是“ML势能不能跑”，而是当前结构优化既耗费DFT成本，又需要判断势模型能否描述真实的界面局部环境。</p></div>
+      <div class="logic">
+        <article><span class="step-label">实验</span><h3>包覆样品表现改善</h3><p>倍率性能提高、GITT表观 Li⁺ 扩散系数提高、阻抗降低。需要解释这些现象是否与局部界面结构和电子态变化相容。</p></article>
+        <article><span class="step-label">现有计算</span><h3>结构与电子结果需要分开验收</h3><p>两层 288 原子模型仍在结构优化中；ML预优化可帮助探索，但其几何必须通过目标DFT受力检查。</p></article>
+        <article><span class="step-label">方法问题</span><h3>怎样把DFT用在最有信息量的地方？</h3><p>不是放弃DFT，而是让ML势承担高频几何搜索，将少量DFT计算用于校正和验收，再用DFT得到最终电子性质。</p></article>
+      </div>
+    </section>
+
+    <section class="section alt" id="project-status">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">02 / WHAT WE KNOW</p><h2>当前进展：有预优化尝试，尚未形成主动学习闭环</h2></div><p class="section-intro">以下数值来自 2026.10.27 的本地项目记录。它们说明为什么需要DFT验收，不代表已经证明DPA4可靠或不可靠。</p></div>
+        <div class="status-grid">
+          <article class="status-card"><h3>288原子两层模型 · DFT弛豫</h3><span class="metric">0.401 eV/Å</span><p>50步后的最大受力分量，仍高于项目采用的 0.05 eV/Å 标准。</p><small>程序结束不等于结构达到受力收敛。</small></article>
+          <article class="status-card"><h3>DPA4-Neo · 几何预优化</h3><span class="metric">0.642 Å</span><p>可动原子平均位移；最大位移 2.559 Å，106 个原子位移超过 0.5 Å。</p><small>界面TM配位分布明显改变；PO₄仍为12/12。</small></article>
+          <article class="status-card warn"><h3>DPA4几何上的DFT单点</h3><span class="metric">未收敛</span><p>已有记录使用另一几何的电荷密度与 onsite.dm 暖启动；249次迭代后 DRHO 仍远高于目标。</p><small>因此尚无可用的该几何DFT力标签；这次失败不能单独归因于ML势。</small></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="mlip">
+      <div class="definition">
+        <div><p class="eyebrow">03 / ML INTERATOMIC POTENTIAL</p><h2>机器学习势学的是原子受力与能量，不是电子结构</h2><p>训练数据通常由DFT对不同原子构型计算得到。ML势拟合能量—几何关系，随后可快速估算新构型的能量和力，用于结构优化或分子动力学。</p></div>
+        <div class="contrast">
+          <div class="contrast-row"><b>ML势直接给出</b><span>近似能量、原子受力；部分模型还给应力或辅助磁矩信息。</span></div>
+          <div class="contrast-row"><b>ML势不自动给出</b><span>DFT自洽电子密度、差分电荷、可靠DOS/PDOS或界面电势。</span></div>
+          <div class="contrast-row"><b>核心风险</b><span>ML极小值满足 ∇E<sub>ML</sub> ≈ 0，不保证DFT力 ∇E<sub>DFT</sub> 也小，尤其是训练数据少见的表面、缺陷和界面环境。</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">04 / TWO ROUTES</p><h2>预优化路线与主动学习路线的关系</h2></div><p class="section-intro">主动学习不是另一种电子结构方法，而是改进ML势训练数据、让它在目标界面附近更可信的一种迭代方式。</p></div>
+        <div class="route-scroll"><table class="route-table"><thead><tr><th>路线</th><th>实际步骤</th><th>适用判断</th></tr></thead><tbody>
+          <tr><td><strong>ML预优化 → DFT最终优化 → 电子结构</strong></td><td>ML找到合理起点，DFT继续优化几何，再在验收结构上做电子性质。</td><td>可靠性较直接，DFT离子步较多；适合作为少量代表结构的对照。</td></tr>
+          <tr><td><strong>ML优化 → DFT力验收 → 电子结构</strong></td><td>DFT在固定ML几何上自洽并计算力；通过标准后不更新原子，直接计算性质。</td><td>可省完整DFT几何优化，但最终是否可省由目标DFT受力和性质敏感性决定。</td></tr>
+          <tr><td><strong>主动学习 + ML优化 → DFT验收</strong></td><td>在ML探索中挑选不确定/新颖构型做DFT标注，更新模型后继续优化与筛选。</td><td>当界面搜索、非晶样本或迁移路径较多时更有价值；不会消除DFT标注成本。</td></tr>
+        </tbody></table></div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="active-learning">
+      <div class="section-head"><div><p class="eyebrow">05 / ACTIVE LEARNING LOOP</p><h2>主动学习：让DFT优先检查模型最可能出错的构型</h2></div><p class="section-intro">模型探索结构空间，DFT提供可信标签，模型再从新增样本中学习。每一轮都必须保留数据来源、收敛状态与模型版本。</p></div>
+      <div class="flow-wrap"><div class="flow">
+        <article class="flow-step"><small>01 · 起始模型</small><h3>已有DFT数据 + 初始势</h3><p>覆盖目标元素、体相、表面、非晶局部和界面接触环境。</p></article>
+        <article class="flow-step"><small>02 · 探索</small><h3>ML优化与采样</h3><p>输出结构轨迹；探索不同接触距离、局部配位和小扰动。</p></article>
+        <article class="flow-step"><small>03 · 查询</small><h3>选择有信息量的样本</h3><p>模型分歧、新局部配位、力突变、异常位移或外推信号。</p></article>
+        <article class="flow-step"><small>04 · 标注</small><h3>对选中构型做DFT</h3><p>自洽收敛后保存能量和力；不收敛结果先诊断，不当标签。</p></article>
+        <article class="flow-step"><small>05 · 更新</small><h3>微调/重训并再验证</h3><p>重启探索；用独立构型检查力误差和最终DFT残余力。</p></article>
+      </div></div>
+      <div class="note"><strong>关键区别：</strong>主动学习不是把每一步优化轨迹都送去DFT，而是避免重复标注相似帧，优先计算模型不熟悉、且会影响结构判断的构型。它减少冗余DFT调用，不会免除DFT。</div>
+    </section>
+
+    <section class="section alt" id="single">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">06 / ONE STARTING STRUCTURE</p><h2>只有一个起始结构，如何做主动采样？</h2></div><p class="section-intro">一条优化轨迹会产生多个几何构型，可支持当前局部能量盆地的自适应采样；但这些相关帧不等于独立非晶样本。</p></div>
+        <div class="one-structure">
+          <ol class="sampling-list">
+            <li><div><b>分段运行并保存轨迹</b><p>保留坐标、能量、原子力和每步是否收敛；不要只留下最终结构。</p></div></li>
+            <li><div><b>按物理变化选帧</b><p>优先选配位变化、新的跨界面接触、较大位移、异常受力或不同候选模型分歧大的几何。</p></div></li>
+            <li><div><b>去除冗余，保留代表性</b><p>相邻优化步通常高度相关。按局部环境/结构差异挑少量帧，另留出独立帧做盲测。</p></div></li>
+            <li><div><b>DFT标注并更新势</b><p>用与最终性质分析一致的方法得到收敛的能量和力，再决定是否微调DPA4或另训适配势。</p></div></li>
+            <li><div><b>重复到通过验收</b><p>更新后继续ML优化，最终用DFT检查目标结构受力、局部配位及关键性质的几何敏感性。</p></div></li>
+          </ol>
+          <aside class="truth-panel"><h3>当前必须核实的两个能力</h3><p><b>不确定度：</b>当前DPA4接口是否提供可靠的外推/不确定度指标？若没有，可用多个模型委员会；若也没有，按配位变化等事件选帧，这应称作较弱的DFT在环自适应采样。</p><p><b>模型更新：</b>当前DPA4-Neo版本是否支持用本项目DFT数据微调？若不支持，不能假设它会在计算过程中自动学习；需建立兼容的微调或局部训练流程。</p><p>在这两项查明前，能确定的是“可以沿轨迹选构型做DFT验证”，还不能声称已搭建完整主动学习系统。</p></aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="verification">
+      <div class="section-head"><div><p class="eyebrow">07 / ACCEPTANCE GATES</p><h2>什么证据足以让ML结构进入电子性质分析？</h2></div><p class="section-intro">训练集平均误差和ML优化器收敛都只是模型指标。结构是否可用于本项目，最终要回到目标DFT方法和具体界面。</p></div>
+      <div class="gate">
+        <article><small>GATE 01</small><h3>DFT电子自洽</h3><p>使用与后续性质一致的PBE+U、磁性和色散设置；电子不收敛时，能量与力不能作为验收结果。</p></article>
+        <article><small>GATE 02</small><h3>DFT残余力</h3><p>在同一固定几何上评估力。项目现用最大受力分量 ≤ 0.05 eV/Å；这是项目标准，不是普适文献门槛。</p></article>
+        <article><small>GATE 03</small><h3>界面局部结构</h3><p>检查PO₄、TM—O/Li—O配位、周期边界、固定层反力和异常接触；不能只看总体平均误差。</p></article>
+        <article><small>GATE 04</small><h3>性质敏感性</h3><p>对代表结构比较电荷转移方向、PDOS关键能窗、结合能排序；若短程DFT细化显著改变结论，就不能省略细化。</p></article>
+      </div>
+      <div class="note"><strong>受力口径：</strong>最大力分量 max|F<sub>iα</sub>| 与最大原子力模 max|F<sub>i</sub>| 不相同；报告时需写清使用哪个量，并只对可动自由度应用几何收敛阈值。固定层反力仍应检查。</div>
+    </section>
+
+    <section class="section dark" id="decision">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">08 / DISCUSSION DECISION</p><h2>当前项目的建议决策</h2></div><p class="section-intro">针对“只有一个界面起点”，先建立最小可验证闭环，再决定是否投入更完整的主动学习训练。</p></div>
+        <div class="decision">
+          <article><h3>先做：最小验证路线</h3><p>保留DPA4轨迹 → 选取发生明显配位/位移变化的少数代表帧 → 先解决这些几何上的DFT自洽 → 检查能量和受力 → 必要时做兼容的微调或短程DFT细化。通过后再重算差分电荷、DOS/PDOS和结合能。</p></article>
+          <article><h3>暂不声称：完整主动学习已完成</h3><p>目前只有一个结构来源；DPA4单点DFT尚未收敛；模型不确定度与微调能力还需确认。现有信息不足以说已获得ML势优化成功结构，或该结构已可直接代表稳定界面。</p></article>
+        </div>
+        <div class="discussion"><b>建议与老师确认：</b>本阶段是否先以DPA4作为低成本几何提案器、DFT单点力作为验收；是否允许对少数代表结构短程DFT细化作对照；后续是否扩展到独立非晶样本、界面间距/配准和Li迁移路径。</div>
+        <div class="sources" aria-label="相关记录">
+          <a href="../ML%E5%8A%BF%E4%BC%98%E5%8C%96%E4%B8%8EDFT%E7%94%B5%E5%AD%90%E7%BB%93%E6%9E%84%E8%B0%83%E7%A0%94_20261027/%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A.html">机器学习势文献调研报告 ↗</a>
+          <a href="%E6%A8%A1%E5%9E%8B%E8%BF%AD%E4%BB%A3%E4%B8%8E50%E6%AD%A5%E5%BC%9B%E8%B1%AB%E5%AE%A1%E8%AE%A1_20261027.md">当前模型与DPA4记录 ↗</a>
+          <a href="index.html#roadmap">返回成果主页的计算路线 ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap footer-inner"><span>LRM × 非晶 Li₃PO₄ · 方法讨论展示</span><a href="index.html">返回计算成果主页</a><span>项目记录核对至 2026.10.27</span></div></footer>
+</body>
+</html>

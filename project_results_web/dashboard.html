@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LRM/Li3PO4 界面计算成果交互看板">
+  <title>LRM × Li₃PO₄ | 计算成果看板</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="看板导航">
+      <a class="logo" href="dashboard.html"><span class="logo-mark">∿</span><span>INTERFACE<br><b>LAB / DASHBOARD</b></span></a>
+      <p class="side-kicker">LRM × Li₃PO₄</p>
+      <nav class="side-nav">
+        <a class="active" href="#overview">总览</a>
+        <a href="#evidence">计算证据</a>
+        <a href="#mechanism">机制线索</a>
+        <a href="#documents">文档中心</a>
+        <a href="#next">后续计算</a>
+      </nav>
+      <div class="side-status"><span class="status-dot"></span><span>阶段性结果<br><b>冻结构型已分析</b></span></div>
+      <a class="side-link" href="index.html">打开完整成果主页 ↗</a>
+    </aside>
+
+    <main class="main">
+      <header class="topline">
+        <div><p class="eyebrow">PROJECT RESULTS / 2026.10</p><h1>界面计算成果看板</h1></div>
+        <div class="top-meta"><span>LRM / amorphous LPO</span><span class="tag warning">结构验收待完成</span></div>
+      </header>
+
+      <section id="overview" class="hero-block">
+        <div class="hero-copy"><p class="eyebrow">ONE SCREEN OVERVIEW</p><h2>从界面接触到<br><em>电子态机制</em></h2><p>把当前冻结构型的结合能、差分电荷、Mulliken、DOS/PDOS 和机器学习势路线放在同一张可筛选看板上。点击卡片查看证据、限定条件和下一步。</p></div>
+        <div class="hero-stats">
+          <div><b>−1.047</b><span>J m⁻² · 面积归一化结合能</span></div>
+          <div><b>0.224</b><span>e · LRM → LPO 半空间重排</span></div>
+          <div><b>85.6%</b><span>O-p · 界面 E<sub>F</sub> 处主导轨道</span></div>
+          <div><b>待验收</b><span>结构受力与局部配位</span></div>
+        </div>
+      </section>
+
+      <section class="control-bar" aria-label="内容筛选">
+        <div class="filter-group"><span class="filter-label">查看内容</span><button class="filter active" data-filter="all">全部</button><button class="filter" data-filter="result">计算结果</button><button class="filter" data-filter="method">方法路线</button><button class="filter" data-filter="document">文档</button><button class="filter" data-filter="next">后续任务</button></div>
+        <label class="search"><span>⌕</span><input id="search" type="search" placeholder="搜索关键词，例如 PDOS、受力、主动学习"></label>
+      </section>
+
+      <section id="evidence" class="dashboard-section">
+        <div class="section-title"><div><p class="eyebrow">01 / EVIDENCE</p><h2>计算证据</h2></div><p>当前结果均对应已有冻结界面；结构优化完成后需在新构型上重算。</p></div>
+        <div class="card-grid">
+          <article class="dash-card result" data-topic="result" data-keywords="结合能 黏附功 冻结参考 接触 有利">
+            <div class="card-head"><span class="icon rust">E</span><span class="card-label">ENERGY</span><span class="confidence partial">条件支持</span></div><h3>界面结合能</h3><strong class="big-number">−1.047 <small>J m⁻²</small></strong><p>原始能量差 −11.437437 eV / 模拟晶胞。负值表示相对于冻结片段接触后能量降低。</p><details><summary>如何理解</summary><p>这是统一晶胞和冻结坐标下的结合倾向，不等于充分弛豫后的热力学稳定性，也未经 BSSE 和系统收敛校正。</p></details>
+          </article>
+          <article class="dash-card result" data-topic="result" data-keywords="差分电荷 电子重排 半空间 LRM LPO 积累 耗尽">
+            <div class="card-head"><span class="icon blue">Δ</span><span class="card-label">CHARGE</span><span class="confidence supported">方向支持</span></div><h3>差分电荷重排</h3><strong class="big-number">0.224 <small>e / cell</small></strong><p>以几何中面划分，LRM 半空间失电子，LPO 半空间得电子。</p><div class="mini-flow"><span>LRM −0.224 e</span><i>→</i><span>LPO +0.224 e</span></div><details><summary>如何理解</summary><p>支持界面接触后的方向性电子重排；数值依赖空间分界，不能直接当作原子氧化态。</p></details>
+          </article>
+          <article class="dash-card result" data-topic="result" data-keywords="Mulliken 布居 原子 电荷 Mn Co Ni P">
+            <div class="card-head"><span class="icon purple">M</span><span class="card-label">POPULATION</span><span class="confidence partial">探索性</span></div><h3>Mulliken 布居变化</h3><strong class="big-number">≈ 0.16 <small>e</small></strong><p>LRM 总布居约 −0.1564 e，LPO 约 +0.1585 e，方向与半空间积分一致。</p><div class="bar"><i style="width:52%"></i></div><details><summary>如何理解</summary><p>Mulliken 依赖 LCAO 基组和投影划分；可以支持重排方向，不能直接给出形式氧化态。</p></details>
+          </article>
+          <article class="dash-card result" data-topic="result" data-keywords="DOS PDOS TDOS O-p Mn-d 电子钝化 费米能级">
+            <div class="card-head"><span class="icon teal">D</span><span class="card-label">ELECTRONIC STATES</span><span class="confidence clue">机制线索</span></div><h3>DOS / PDOS 调制</h3><strong class="big-number">85.6 <small>% O-p</small></strong><p>界面 E<sub>F</sub> 处 O-p 占主导，Mn-d 与 LRM 相区点值下降。</p><details><summary>如何理解</summary><p>支持电子态被调制；窗口积分未统一下降，尚不能单独证明“有害表面态被钝化”。</p></details></article>
+        </div>
+        <div class="figure-strip" aria-label="代表性图像">
+          <button class="figure-thumb" data-image="../charge_difference_d8f1704e_20261023/VESTA_cubes/vesta_charge_clean_boundaries.png" data-caption="差分电荷三维等值面：黄色为电子积累，青色为电子耗尽"><img src="../charge_difference_d8f1704e_20261023/VESTA_cubes/vesta_charge_clean_boundaries.png" alt="差分电荷三维等值面"><span>差分电荷 · 三维等值面</span></button>
+          <button class="figure-thumb" data-image="../charge_difference_d8f1704e_20261023/charge_planar.png" data-caption="平面平均差分电荷与累计电子数变化"><img src="../charge_difference_d8f1704e_20261023/charge_planar.png" alt="平面平均差分电荷"><span>差分电荷 · 平面平均</span></button>
+          <button class="figure-thumb" data-image="../pdos_combined_d8f1704e_20261023/figures/pdos_orbitals.png" data-caption="轨道分辨 PDOS：观察 O-p 与过渡金属 d 态的能区重叠"><img src="../pdos_combined_d8f1704e_20261023/figures/pdos_orbitals.png" alt="轨道分辨 PDOS"><span>PDOS · 轨道分辨</span></button>
+        </div>
+      </section>
+
+      <section id="mechanism" class="dashboard-section tinted">
+        <div class="section-title"><div><p class="eyebrow">02 / MECHANISM</p><h2>机制线索</h2></div><p>每条线索都标出当前能支持的强度，避免把局部证据写成性能因果。</p></div>
+        <div class="mechanism-grid">
+          <article class="mechanism-card"><span class="step">01</span><h3>接触后发生电子重排</h3><p>差分密度、平面平均和 Mulliken 分析共同指向 LRM → LPO 的重排方向。</p><b class="support-line">当前支持：较明确</b></article>
+          <article class="mechanism-card"><span class="step">02</span><h3>界面结合具有能量降低倾向</h3><p>冻结参考下 E<sub>bind</sub> 为负，说明接触态能量低于两片段能量和。</p><b class="support-line">当前支持：依赖参考态</b></article>
+          <article class="mechanism-card"><span class="step">03</span><h3>可能存在电子钝化线索</h3><p>部分近费米谱权重降低，但尚未完成共同能量对齐、表层原子对应和结构验收。</p><b class="support-line">当前支持：待验证假设</b></article>
+        </div>
+        <div class="mechanism-note"><b>实验联系：</b>倍率性能、GITT 表观扩散系数和阻抗改善可以与界面调制形成机制上的一致解释，但当前静态电子结构不能给出这些性能的定量因果证明。</div>
+      </section>
+
+      <section id="documents" class="dashboard-section">
+        <div class="section-title"><div><p class="eyebrow">03 / DOCUMENTS</p><h2>文档中心</h2></div><p>点击“预览”在看板中快速查看；点击“打开”使用浏览器完整阅读。</p></div>
+        <div class="doc-grid">
+          <article class="doc-card document" data-topic="document" data-keywords="ABACUS 计算方案 结构优化 结合能 差分电荷 DOS PDOS"><span class="doc-type">PLAN</span><h3>LRM—非晶 Li₃PO₄ ABACUS 计算方案</h3><p>模型、统一参数、计算顺序和验收标准。</p><div><button class="preview-doc" data-doc="docs/LRM-LPO_ABACUS_plan.md" data-title="ABACUS 计算方案">预览</button><a href="docs/LRM-LPO_ABACUS_plan.md" target="_blank">打开 ↗</a></div></article>
+          <article class="doc-card document method" data-topic="method" data-keywords="DPA4 高参数 checkpoint 机器学习势 主动学习 训练 DFT 单点 受力"><span class="doc-type teal-bg">MLIP</span><h3>DPA4 高参数 checkpoint 技术实施路线</h3><p>网页化技术细节：预检、选帧、标签、微调和验收。</p><div><a href="mlip-technical-plan.html" target="_blank">打开网页 ↗</a></div></article>
+          <article class="doc-card document result" data-topic="document" data-keywords="差分电荷密度 报告 电子重排 平面平均"><span class="doc-type blue-bg">CHARGE</span><h3>差分电荷密度完整报告</h3><p>积分、图像、边界说明和结论边界。</p><div><a href="../charge_difference_d8f1704e_20261023/%E5%B7%AE%E5%88%86%E7%94%B5%E8%8D%B7%E5%AF%86%E5%BA%A6%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A_%E5%AE%8C%E6%95%B4%E7%89%88.md" target="_blank">打开文档 ↗</a></div></article>
+          <article class="doc-card document result" data-topic="document" data-keywords="DOS PDOS 联合分析 TDOS 轨道 自旋 相区"><span class="doc-type purple-bg">DOS</span><h3>DOS / PDOS 联合分析报告</h3><p>TDOS、元素、轨道、自旋和相区投影的解释。</p><div><a href="../pdos_combined_d8f1704e_20261023/DOS_PDOS_%E8%81%94%E5%90%88%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A.md" target="_blank">打开文档 ↗</a></div></article>
+          <article class="doc-card document result" data-topic="document" data-keywords="Mulliken 电荷 布居 逐原子 元素 分层"><span class="doc-type rust-bg">MULLIKEN</span><h3>Mulliken 电荷重新分析报告</h3><p>原子匹配、元素汇总、空间分层和解释边界。</p><div><a href="../Mulliken%E7%94%B5%E8%8D%B7%E9%87%8D%E6%96%B0%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A_d8f1704e_20261027.md" target="_blank">打开文档 ↗</a></div></article>
+          <article class="doc-card document" data-topic="document" data-keywords="老师讨论 电子结构 结果 后续计算 思路"><span class="doc-type">DISCUSS</span><h3>与老师讨论：界面电子结构</h3><p>当前结论、不能支持的问题和后续证据需求。</p><div><a href="../%E4%B8%8E%E8%80%81%E5%B8%88%E8%AE%A8%E8%AE%BA_%E7%95%8C%E9%9D%A2%E7%94%B5%E5%AD%90%E7%BB%93%E6%9E%84%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%90%8E%E7%BB%AD%E8%AE%A1%E7%AE%97%E6%80%9D%E8%B7%AF.md" target="_blank">打开文档 ↗</a></div></article>
+        </div>
+      </section>
+
+      <section id="next" class="dashboard-section tinted">
+        <div class="section-title"><div><p class="eyebrow">04 / NEXT ACTIONS</p><h2>后续计算优先级</h2></div><p>先解决会改变结论可信度的瓶颈，再扩展机制分析。</p></div>
+        <div class="next-list">
+          <article class="next-item next"><span class="priority p1">P1</span><div><h3>完成 ML/DFT 结构验收</h3><p>检查可动原子最大受力、异常短 TM—O、PO₄ 配位和固定层反力；通过后重新做三套一致 DFT 单点。</p></div><span class="todo">必须</span></article>
+          <article class="next-item next"><span class="priority p1">P1</span><div><h3>在验收结构上重算三条证据链</h3><p>重新计算结合能、差分电荷和 DOS/PDOS，不沿用旧冻结构型的数值。</p></div><span class="todo">必须</span></article>
+          <article class="next-item next"><span class="priority p2">P2</span><div><h3>补充电子态与键合判据</h3><p>做共同能量对齐、表层原子 PDOS，并按需要增加 ELF 或 COHP/COOP。</p></div><span class="todo optional">建议</span></article>
+          <article class="next-item next"><span class="priority p2">P2</span><div><h3>验证多构型和实验联系</h3><p>比较不同非晶样本/界面配准；若解释 Li 传输或阻抗，进一步做迁移势垒、扩散或界面反应计算。</p></div><span class="todo optional">扩展</span></article>
+        </div>
+      </section>
+
+      <footer class="footer"><span>LRM × Li₃PO₄ · 交互成果看板</span><span>结果范围：当前冻结构型 · 结构验收完成后更新</span></footer>
+    </main>
+  </div>
+
+  <div class="modal" id="image-modal" aria-hidden="true"><div class="modal-box image-box"><button class="modal-close" data-close="image-modal" aria-label="关闭">×</button><img id="modal-image" alt=""><p id="modal-caption"></p></div></div>
+  <div class="modal" id="doc-modal" aria-hidden="true"><div class="modal-box doc-box"><button class="modal-close" data-close="doc-modal" aria-label="关闭">×</button><div class="doc-modal-head"><span class="eyebrow">DOCUMENT PREVIEW</span><h2 id="doc-title">文档预览</h2></div><pre id="doc-content">正在读取文档……</pre></div></div>
+</body>
+</html>

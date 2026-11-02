@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LRM × Li3PO4 项目网页总入口">
+  <title>LRM × Li₃PO₄ | 项目网页总入口</title>
+  <link rel="stylesheet" href="project-hub.css">
+  <script src="project-pages.js?v=20261102-v32" defer></script>
+  <script src="project-hub.js" defer></script>
+</head>
+<body>
+  <main class="hub-shell">
+    <header class="hub-header">
+      <div class="brand"><span class="brand-symbol">⊕</span><div><span class="eyebrow">LRM × Li₃PO₄ / PROJECT HUB</span><h1>项目网页总入口</h1></div></div>
+      <div class="header-note"><span class="online-dot"></span> 独立页面模块化管理</div>
+    </header>
+
+    <section class="hub-intro">
+      <div><p class="eyebrow">MODULAR RESEARCH WEBSITE</p><h2>一个入口，<em>多个独立网页</em></h2><p>这里负责组织项目网页，不嵌套或改写各个页面。点击卡片即可打开对应模块；每个模块保留自己的内容、样式和交互，后续新增网页也可以独立接入。</p></div>
+      <div class="hub-principle"><span>设计原则</span><b>入口统一<br>页面独立<br>内容可扩展</b></div>
+    </section>
+
+    <section class="hub-controls">
+      <div class="filters"><span>筛选</span><button class="hub-filter active" data-filter="all">全部</button><button class="hub-filter" data-filter="result">成果</button><button class="hub-filter" data-filter="method">方法</button><button class="hub-filter" data-filter="document">文档</button></div>
+      <label class="hub-search">⌕ <input id="hub-search" type="search" placeholder="搜索网页或主题"></label>
+    </section>
+
+    <section class="hub-section">
+      <div class="section-heading"><div><p class="eyebrow">PAGES</p><h2>网页模块</h2></div><p id="page-count"></p></div>
+      <div id="page-grid" class="page-grid"></div>
+    </section>
+
+    <section class="hub-section add-section">
+      <div class="section-heading"><div><p class="eyebrow">EXTENSION</p><h2>后续如何接入新网页？</h2></div><p>只维护页面清单，已有页面不用改。</p></div>
+      <div class="extension-grid">
+        <div class="extension-step"><b>01</b><h3>保留独立文件</h3><p>新网页放在 `project_results_web/`，使用自己的 HTML/CSS/JS。</p></div>
+        <div class="extension-step"><b>02</b><h3>登记一个入口</h3><p>在 `project-pages.js` 增加标题、分类、简介和相对路径。</p></div>
+        <div class="extension-step"><b>03</b><h3>自动出现在总入口</h3><p>总入口按清单生成卡片，筛选和搜索会自动生效。</p></div>
+      </div>
+      <pre class="config-example">{ id: "new-page", type: "method", title: "新方法页面", href: "new-page.html", summary: "页面简介", keywords: "关键词" }</pre>
+    </section>
+
+    <footer class="hub-footer"><span>LRM × Li₃PO₄ · Project Hub</span><span>总入口独立于各成果网页</span></footer>
+  </main>
+</body>
+</html>

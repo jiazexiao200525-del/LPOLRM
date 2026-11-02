@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="LRM/非晶 Li3PO4 局部界面计算阶段成果展示" />
+  <title>LRM × Li₃PO₄ | 局部界面计算成果</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="report-additions.css" />
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="返回顶部">
+      <span class="brand-mark"><span></span><span></span><span></span></span>
+      <span>INTERFACE LAB<span class="brand-dot">/</span>01</span>
+    </a>
+    <nav class="nav" aria-label="页面导航">
+      <a href="#questions">科学问题</a>
+      <a href="#plan">方案设计</a>
+      <a href="#evidence">证据链</a>
+      <a href="#mulliken">Mulliken 电荷</a>
+      <a href="#dos">DOS / PDOS</a>
+      <a href="#limits">证据边界</a>
+      <a href="#model-iteration">模型对比</a>
+      <a href="#roadmap">下一步</a>
+      <a href="dashboard.html">交互看板</a>
+      <a href="mlip-active-learning.html">ML势讨论</a>
+    </nav>
+    <div class="phase-pill"><span class="pulse"></span>阶段性结果 · 2026.10</div>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">LRM / amorphous Li₃PO₄ interface</p>
+        <h1>包覆层如何改变<br /><em>界面电子结构？</em></h1>
+        <p class="lead">面向裸富锂锰基层状氧化物（LRM）与约 5 nm ALD-Li₃PO₄ 包覆样品的局部界面计算。当前冻结模型已经给出电荷重排、界面结合和电子态调制的第一组证据。</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#evidence">查看证据链 <span>↘</span></a>
+          <a class="btn btn-ghost" href="#roadmap">查看后续计划</a>
+        </div>
+        <div class="hero-note"><span class="tiny-check">✓</span> 三套体系均通过电子 SCF 收敛检查 · 结果适用于当前固定几何</div>
+      </div>
+      <div class="hero-visual" aria-label="界面概念图">
+        <div class="orb orb-a"></div><div class="orb orb-b"></div>
+        <div class="visual-grid"></div>
+        <div class="interface-label label-lrm">LRM<br /><small>局部表面</small></div>
+        <div class="interface-label label-lpo">LPO<br /><small>非晶包覆层</small></div>
+        <div class="interface-line"><span class="charge charge-minus">−</span><span class="line-dash"></span><span class="charge charge-plus">+</span></div>
+        <div class="visual-caption">电子布居变化示意：LRM ΔN &lt; 0 → LPO ΔN &gt; 0<br />概念示意，非原子结构或电荷正负图</div>
+      </div>
+    </section>
+
+    <section class="experiment-strip">
+      <div class="wrap strip-inner">
+        <div><span class="strip-kicker">实验背景</span><strong>ALD-Li₃PO₄ 包覆后</strong>倍率性能 ↑　GITT 表观 D<sub>Li⁺</sub> ↑　阻抗 ↓</div>
+        <div class="strip-arrow">→</div>
+        <div class="strip-result"><span class="strip-kicker">本阶段计算</span><strong>寻找可验证的界面机制线索</strong></div>
+      </div>
+    </section>
+
+    <section id="questions" class="section wrap">
+      <div class="section-head">
+        <div><p class="eyebrow">01 / SCIENTIFIC QUESTIONS</p><h2>三个问题，三条证据链</h2></div>
+        <p class="section-intro">计算把“性能变好”的实验现象拆成局部结构、界面能量与电子态三个层次，先回答可由当前模型支持的问题。</p>
+      </div>
+      <div class="question-grid">
+        <article class="question-card q1"><div class="q-number">Q1</div><h3>能否形成稳定的局部界面？</h3><p>需以受力收敛、配位合理性及构型比较验收结构；电子 SCF 收敛只能说明当前几何下的电子自洽。</p><div class="status status-partial"><span></span>尚未确认 · 待结构验收</div></article>
+        <article class="question-card q2"><div class="q-number">Q2</div><h3>结合是否有利，电荷如何重排？</h3><p>先比较冻结片段能量，再用差分密度、空间积分和 Mulliken 分析接触区域的重排。</p><div class="status status-supported"><span></span>支持 · 当前冻结构型</div></article>
+        <article class="question-card q3"><div class="q-number">Q3</div><h3>是否存在电子钝化证据？</h3><p>用 TDOS/PDOS 比较界面近费米态及 Mn-d 贡献，检验电子态变化能否支持钝化假设。</p><div class="status status-clue"><span></span>态调制有证据 · 钝化待检验</div></article>
+      </div>
+    </section>
+
+    <section class="section section-tinted" id="model">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">02 / MODEL & METHOD</p><h2>局部界面模型</h2></div><p class="section-intro">三套体系使用相同晶胞、统一参数和逐原子对应关系，保证差分和能量比较的参照一致。</p></div>
+        <div class="model-layout">
+          <div class="model-figure">
+            <div class="cell-outline"><div class="layer layer-lrm"><span>LRM</span></div><div class="layer layer-interface"><span>interface</span></div><div class="layer layer-lpo"><span>LPO</span></div></div>
+            <div class="axis axis-x"><span>x</span></div><div class="axis axis-y"><span>y</span></div>
+            <p>局部接触模型 · 192 atoms</p>
+          </div>
+          <div class="model-table-wrap">
+            <table class="model-table"><thead><tr><th>标记</th><th>体系</th><th>原子数</th><th>用途</th></tr></thead><tbody>
+              <tr><td><b class="tag tag-a">A</b></td><td>LRM/LPO 完整局部界面</td><td>192</td><td>界面电子结构、总能量</td></tr>
+              <tr><td><b class="tag tag-b">B1</b></td><td>冻结 LRM 片段</td><td>97</td><td>电荷与能量参照</td></tr>
+              <tr><td><b class="tag tag-c">C1</b></td><td>冻结 LPO 片段</td><td>95</td><td>电荷与能量参照</td></tr>
+            </tbody></table>
+            <div class="parameter-chips"><span>PBE + DFT+U</span><span>D3(BJ)</span><span>100 Ry</span><span>1×3×2 k</span><span>自旋极化</span><span>DOS 谱线 σ = 0.05 eV</span></div>
+            <p class="model-footnote">模型边界：LPO 为有限非晶片段 Li₃₅P₁₂O₄₈，用于局部机制研究，不等同于完整 5 nm 包覆层。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="plan">
+      <div class="section-head"><div><p class="eyebrow">03 / COMPUTATIONAL DESIGN</p><h2>计算方案设计</h2></div><p class="section-intro">依据上传的 ABACUS 计算方案整理：先验收局部界面，再用统一参考态连接结合能、电荷与电子态。方案描述的是拟执行流程；下方已有结果来自尚未完成结构验收的快照。</p></div>
+      <div class="plan-banner"><div><b>本阶段目标：局部结构 → 结合与电荷 → 电子钝化线索</b><p>约 5 nm 包覆层是实验背景；192 原子模型研究局部接触。本阶段不直接计算 Li⁺ 迁移势垒、扩散系数或阻抗。</p></div><a class="btn btn-ghost" href="docs/LRM-LPO_ABACUS_plan.md" download>下载完整方案 ↓</a></div>
+      <div class="plan-grid">
+        <article class="plan-card"><span class="road-label">01 / 结构与优化</span><h3>先获得可验收的界面</h3><p>非晶 LPO 来源于 Packmol 建模、高温退火与 0 K 优化；采用 LRM（001）表面。优先续算当前界面，固定晶胞、所有原子放松。</p><p class="plan-output"><b>验收与交付</b> SCF、最大受力分量和几何合理性同时通过；交付 STRU/CIF、收敛日志及局部配位检查。</p></article>
+        <article class="plan-card"><span class="road-label">02 / 结合能与黏附功</span><h3>定义一致的冻结参考态</h3><p>从同一界面删除对应组分，得到冻结 LRM/LPO；保留晶胞与原子坐标，统一 U 映射、基组、k 点及色散处理。</p><p class="plan-output"><b>验收与交付</b> 三套 SCF 均收敛；交付三个总能、结合能、界面面积、接触界面数及黏附功。</p></article>
+        <article class="plan-card"><span class="road-label">03 / 差分电荷与原子布居</span><h3>定位重排，并检查划分方法</h3><p>核对密度网格、原点、单位和电子数，计算三维差分与 a 方向平面平均。Bader 需验证分区；现有 Mulliken 差值提供另一种布居分析。</p><p class="plan-output"><b>验收与交付</b> 密度文件、等值面、平面平均、逐原子映射和电荷表；原子布居不等于形式氧化态。</p></article>
+        <article class="plan-card"><span class="road-label">04 / DOS 与 PDOS</span><h3>辨别近费米态及区域贡献</h3><p>对比界面与注明参考态的裸 LRM，分析 Mn/Co/Ni-d、O/P-p、Li-s 及接触区域投影；测试面内 k 点和谱线展宽。</p><p class="plan-output"><b>验收与交付</b> 总 DOS、自旋及区域/轨道 PDOS、归一化与能量参考说明；钝化判断结合结构和电荷共同讨论。</p></article>
+      </div>
+      <details class="plan-details" open><summary>统一参数与结构验收标准</summary><div class="plan-detail-body">
+        <div class="table-scroll"><table class="model-table plan-table"><caption>上传方案所记录的续算基准；尚不代表全部参数已完成收敛测试</caption><thead><tr><th>类别</th><th>方案设置</th><th>检查重点</th></tr></thead><tbody>
+          <tr><td>程序与方法</td><td>ABACUS LTS v3.10.1；自旋 PBE+U；LCAO / genelpa；D3(BJ)</td><td>赝势、轨道与程序版本一同归档</td></tr>
+          <tr><td>基组与 k 点</td><td>100 Ry；Gamma 中心 1×3×2</td><td>真空沿 a，面内沿 b、c；追加采样敏感性检查</td></tr>
+          <tr><td>Hubbard U</td><td>Mn 3.9 / Co 3.3 / Ni 6.2 eV</td><td>完整体系顺序 Li/Mn/Co/Ni/O/P；片段同步修改映射</td></tr>
+          <tr><td>计划中的优化自洽</td><td>scf_thr = 1e−6；scf_nmax = 300</td><td>上传续算方案参数；不是下方静态结果的阈值</td></tr>
+          <tr><td>已有三套静态 SCF</td><td>scf_thr = 1e−7；scf_nmax = 400</td><td>A / B1 / C1 分别 185 / 341 / 63 步；均电子收敛。mixing_beta = 0.2，磁性混合 0.4</td></tr>
+          <tr><td>占据展宽</td><td>Gaussian 0.002 Ry（约 0.0272 eV）</td><td>区别于已有 DOS 绘图谱线展宽 0.05 eV</td></tr>
+          <tr><td>几何优化</td><td>BFGS；relax_nmax = 200；固定晶胞</td><td>最大受力分量 ≤ 0.05 eV/Å；到达步数或时限不等于收敛</td></tr>
+          <tr><td>局部结构</td><td>检查 12 个 P 的 PO₄ 配位、Li—O 和 TM—O 环境</td><td>考虑周期边界、异常短距离及薄 LRM 层重构</td></tr>
+        </tbody></table></div>
+        <div class="plan-equations"><p>E<sub>bind</sub> = E<sub>interface</sub> − E<sub>LRM,frozen</sub> − E<sub>LPO,frozen</sub></p><p>W<sub>sep,frozen</sub> = −E<sub>bind</sub> / (n<sub>int</sub>A)，A = |b × c|</p><small>负结合能表示相对冻结片段接触后能量降低。已有模型的结构审核按单接触界面 n<sub>int</sub> = 1；模型改变后须重核。此处为冻结参考态的分离功估计，不自动包含独立表面松弛或形变代价。</small></div>
+      </div></details>
+      <p class="plan-scope">执行顺序：界面优化与验收 → 冻结片段 SCF / 结合能 → 差分电荷与布居 → DOS / PDOS → 综合讨论。下方数值保留为已有冻结构型结果，优化后需在验收结构上重新分析。</p>
+    </section>
+
+    <section class="section wrap" id="evidence">
+      <div class="section-head"><div><p class="eyebrow">04 / COMPUTATIONAL EVIDENCE</p><h2>结果从哪里来？</h2></div><p class="section-intro">按结合能 → 空间电荷重排 → 原子布居 → 电子态的顺序汇报。点击图像可放大查看。</p></div>
+      <div class="callout callout-orange audit-notice"><span class="callout-icon">!</span><div><b>共同前提：电子已收敛，结构尚未完成验收</b><p>现有结果描述当前冻结几何。约 1.68 Å 的短 TM—O 接触提示需检查配位、受力和优化停止原因；单个短距离本身不足以判定整体结构失稳。优化完成后需重新生成参照并复算。</p></div></div>
+      <div class="metric-grid">
+        <article class="metric-card metric-orange"><span class="metric-label">半空间净重排</span><strong>0.224 <small>e</small></strong><p>LRM → LPO / 模拟晶胞</p></article>
+          <article class="metric-card metric-blue"><span class="metric-label">面积归一化界面结合能</span><strong>−1.047 <small>J m⁻²</small></strong><p>E<sub>bind</sub> / 面积 · n<sub>int</sub> = 1</p></article>
+        <article class="metric-card metric-purple"><span class="metric-label">原始冻结结合能</span><strong>−11.4374 <small>eV/cell</small></strong><p>E<sub>A</sub> − E<sub>B1</sub> − E<sub>C1</sub></p></article>
+        <article class="metric-card metric-teal"><span class="metric-label">E<sub>F</sub> 处主导轨道</span><strong>85.6 <small>%</small></strong><p>O-p 贡献 / states at E<sub>F</sub></p></article>
+      </div>
+
+      <div class="evidence-block binding-block" id="binding">
+        <div class="block-title"><div><span class="block-index">A</span><h3>结合能 · 当前接触是否有利？</h3></div></div>
+        <div class="table-scroll"><table class="model-table plan-table"><caption>同晶胞、同坐标冻结片段；单位 eV。末位仅保留用于复核差值，不代表相应物理精度。</caption><thead><tr><th>体系</th><th>总能量 / eV</th><th>参考态</th></tr></thead><tbody>
+          <tr><td>A：完整界面</td><td>−115562.40636721</td><td>192 原子，自洽电子态</td></tr>
+          <tr><td>B1：LRM</td><td>−85532.95590232</td><td>97 原子，坐标冻结、电子单独自洽</td></tr>
+          <tr><td>C1：LPO</td><td>−30018.01302772</td><td>95 原子，坐标冻结、电子单独自洽</td></tr>
+        </tbody></table></div>
+        <div class="plan-equations"><p>面积归一化界面结合能：E<sub>bind</sub> / (n<sub>int</sub>A) = <b>−0.06536 eV/Å² ≈ −1.047 J/m²</b></p><p>冻结参考态分离功：W<sub>sep,frozen</sub> = −E<sub>bind</sub> / (n<sub>int</sub>A) = <b>+1.047 J/m²</b></p><p>原始总能量差：E<sub>A</sub> − E<sub>B1</sub> − E<sub>C1</sub> = −11.437437 eV / 模拟晶胞；A = 174.9927 Å²，n<sub>int</sub> = 1。</p><small>“每模拟晶胞”是整个 192 原子接触模型的总能量差，不是每原子、每个化学键或每个 Li₃PO₄ 单元。负界面结合能表示相对冻结片段的能量降低倾向；正分离功是同一结果的反号。面积归一化结果未经 BSSE 校正及系统收敛测试，不应单独据此判断强弱。</small></div>
+        <div class="interpretation-row"><div class="callout callout-blue"><span class="callout-icon">↗</span><div><b>支持接触后的能量降低倾向</b><p>在此几何、分组和磁性解下，完整界面比两个冻结片段的总能量和低。不能仅凭负号证明优化完成或热力学稳定。</p></div></div><div class="callout callout-muted"><span class="callout-icon">!</span><div><b>暂不定义为“强结合”或“弱结合”</b><p>需要同方法、相近终止面和参考态的对照。现值未经基组重叠误差（BSSE）校正，也未完成 k 点、基组和磁态敏感性检验；不是松弛形成自由能。</p></div></div></div>
+      </div>
+
+      <div class="evidence-block charge-block">
+        <div class="block-title"><div><span class="block-index">B</span><h3>差分电荷密度 · 界面重排</h3></div><span class="legend">Δρ &gt; 0 为电子积累；具体颜色见各图说明</span></div>
+        <div class="figure-grid figure-grid-charge">
+          <figure class="figure-card featured"><button class="image-button" data-src="../charge_difference_d8f1704e_20261023/VESTA_cubes/vesta_charge_clean_boundaries.png" data-caption="VESTA 差分电荷等值面：界面附近可见相邻的电子积累与耗尽区域"><img src="../charge_difference_d8f1704e_20261023/VESTA_cubes/vesta_charge_clean_boundaries.png" alt="VESTA 差分电荷等值面" loading="lazy"></button><figcaption><b>三维等值面</b><span>黄色积累 / 青色耗尽；等值面 ±0.003 e/Å³</span></figcaption></figure>
+          <figure class="figure-card"><button class="image-button" data-src="../charge_difference_d8f1704e_20261023/charge_planar.png" data-caption="平面平均差分电荷：沿界面法向观察积累/耗尽峰"><img src="../charge_difference_d8f1704e_20261023/charge_planar.png" alt="平面平均差分电荷" loading="lazy"></button><figcaption><b>平面平均</b><span>金黄为正、蓝为负；沿 x 法向，平均 b–c 面</span></figcaption></figure>
+          <figure class="figure-card"><button class="image-button" data-src="../charge_difference_d8f1704e_20261023/charge_projection.png" data-caption="沿 c 平均的 x–y 差分密度投影：x 为法向，y 为面内方向，单位 e/Å³"><img src="../charge_difference_d8f1704e_20261023/charge_projection.png" alt="二维投影差分电荷" loading="lazy"></button><figcaption><b>沿 c 平均的 x–y 投影</b><span>金黄为正、蓝为负；可见 y 方向非均匀，c 已平均</span></figcaption></figure>
+        </div>
+        <div class="interpretation-row"><div class="callout callout-orange"><span class="callout-icon">↗</span><div><b>支持什么</b><p>界面存在方向性的电子重排。以 x = 19.086 Å 几何中面划分，LRM −0.224452 e，LPO +0.223884 e。</p></div></div><div class="callout callout-muted"><span class="callout-icon">!</span><div><b>不要过度解读</b><p>全空间积累/耗尽积分各约 2.24 e，包含局部极化及相间变化，不能当作净转移电子数，也不能直接给出原子氧化态。</p></div></div></div>
+      </div>
+      <p class="plan-scope">分界面从 x = 18.867 移至 19.306 Å 时，LPO 半空间积分为 +0.168～+0.257 e，方向保持 LRM → LPO。全空间残差 −0.000568 e；0.224 e 是指定分界下的结果，不是唯一原子电荷。图中的 Δρ 是电子数密度差，正值表示电子积累。</p>
+    </section>
+
+    <section class="section section-tinted" id="mulliken">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">05 / MULLIKEN POPULATION · 2026.10.27</p><h2>Mulliken 电荷结果</h2></div><p class="section-intro">同一冻结构型的 A / B1 / C1 逐原子比较：三套 SCF 均收敛，192 个原子全部匹配，最大坐标残差为 0 Å。</p></div>
+        <div class="mulliken-definition"><b>ΔNᵢ = Nᵢ（完整界面）− Nᵢ（冻结片段）</b><p>正值表示 Mulliken 电子布居增加，负值表示减少；若写成净离子电荷变化，则 Δqᵢ = −ΔNᵢ。</p></div>
+        <div class="mulliken-metrics">
+          <article class="metric-card metric-orange"><span class="metric-label">LRM · 97 原子</span><strong>−0.1564 <small>e</small></strong><p>相对冻结片段的电子布居减少</p></article>
+          <article class="metric-card metric-blue"><span class="metric-label">LPO · 95 原子</span><strong>+0.1585 <small>e</small></strong><p>相对冻结片段的电子布居增加</p></article>
+          <article class="metric-card metric-purple"><span class="metric-label">两相合计</span><strong>+0.0021 <small>e</small></strong><p>近似守恒；报告归因于布居输出舍入</p></article>
+        </div>
+        <div class="interpretation-row">
+          <div class="callout callout-blue"><span class="callout-icon">↗</span><div><b>与差分电荷的重排方向一致</b><p>Mulliken 给出约 0.16 e 的 LRM → LPO 净布居变化；半空间密度积分约 0.224 e。两者分别按原子轨道布居与空间区域划分，支持相同方向，数值不应混用，也不是相互独立的两套计算验证。</p></div></div>
+          <div class="callout callout-orange"><span class="callout-icon">!</span><div><b>当前结果仅适用于该结构快照</b><p>重新分析报告记录了约 1.68 Å 的异常短 TM—O 距离及表面重构问题。此结果支持探索性的电荷重排，尚不能证明真实平衡界面的转移量、原子氧化态或稳定性。</p></div></div>
+        </div>
+        <details class="plan-details" open><summary>元素分解：电子布居变化由哪些原子贡献？</summary><div class="plan-detail-body">
+          <div class="table-scroll"><table class="model-table plan-table"><caption>相内求和 ΣΔN；单位 e，正值为电子布居增加</caption><thead><tr><th>相区</th><th>元素（原子数）</th><th>ΣΔN / e</th></tr></thead><tbody>
+            <tr><td>LRM</td><td>Co（3）</td><td>−0.1255</td></tr><tr><td>LRM</td><td>Mn（13）</td><td>−0.1323</td></tr><tr><td>LRM</td><td>Ni（3）</td><td>−0.0555</td></tr><tr><td>LRM</td><td>O（48）</td><td>+0.1002</td></tr><tr><td>LRM</td><td>Li（30）</td><td>+0.0567</td></tr>
+            <tr><td>LPO</td><td>Li（35）</td><td>+0.2562</td></tr><tr><td>LPO</td><td>O（48）</td><td>+0.0969</td></tr><tr><td>LPO</td><td>P（12）</td><td>−0.1946</td></tr>
+          </tbody></table></div>
+          <p class="plan-scope">LRM 的 Co/Mn/Ni 布居减少，Li/O 略有补偿；LPO 的 Li/O 增加而 P 减少。因此不能将全部电子变化归结为“转移到 O”，也不能据此指定形式氧化态。</p>
+        </div></details>
+        <details class="plan-details"><summary>空间分层与磁矩：重排集中在哪里？</summary><div class="plan-detail-body">
+          <div class="table-scroll"><table class="model-table plan-table"><caption>LRM 最右 / LPO 最左表面原子分别作为本相距离零点，并非共同中面；距离单位 Å，ΣΔN 单位 e</caption><thead><tr><th>距界面 / Å</th><th>LRM：原子数 / ΣΔN</th><th>LPO：原子数 / ΣΔN</th></tr></thead><tbody>
+            <tr><td>0–2</td><td>23 / −0.1542</td><td>19 / +0.2378</td></tr><tr><td>2–4</td><td>32 / +0.0215</td><td>36 / −0.0360</td></tr><tr><td>4–6</td><td>34 / −0.0074</td><td>35 / −0.0424</td></tr><tr><td>6–8</td><td>8 / −0.0163</td><td>5 / −0.0009</td></tr>
+          </tbody></table></div>
+          <p class="plan-scope">主要变化集中在距各相接触表面 0–2 Å，外侧仍有正负补偿。LRM / LPO 总 Mulliken 磁矩分别变化 +0.994 / +0.300 μB；其中 Ni 分量约 +1.744 μB。受当前几何质量限制，仅视为该快照的自旋重排信号。</p>
+        </div></details>
+        <p class="plan-scope">Mulliken 依赖 LCAO 基组与重叠布居划分；它不受本次 Bader 空盆问题的同一种分区机制约束，但不能证明 P 的 Bader 分区已修复。优化后需复算并检查趋势是否保留。</p>
+        <div class="hero-actions mulliken-actions"><a class="btn btn-ghost" href="../Mulliken%E7%94%B5%E8%8D%B7%E9%87%8D%E6%96%B0%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A_d8f1704e_20261027.md" download>下载完整报告 ↓</a></div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="dos">
+      <div class="section-head"><div><p class="eyebrow">06 / ELECTRONIC STATES</p><h2>DOS / PDOS 结果与钝化假设</h2></div><p class="section-intro">电荷重排之后，再看能量分辨的态密度变化。DOS 不等于电荷，也不直接代表电导或反应活性。</p></div>
+      <div class="evidence-block dos-block">
+        <div class="block-title"><div><span class="block-index">D</span><h3>DOS / PDOS · 电子态调制</h3></div><span class="legend legend-dos">各体系自身 E<sub>F</sub> = 0 · σ = 0.05 eV</span></div>
+        <div class="callout callout-muted audit-notice"><span class="callout-icon">i</span><div><b>读图必须保留三个口径</b><p>① 不同体系各以自己的 E<sub>F</sub> 为零，尚未做真空或平均电势对齐；不能由峰位平移推导带阶、功函数或内建电场。② TDOS、元素、轨道和自旋图按各体系全部原子数归一化；相区图按该相区 97/95 个原子归一化，单位为 states/eV/atom。③ 上述百分比由界面内部 E<sub>F</sub> 点插值、按胞加和得到，不是整个能窗平均、电子数或电荷转移比例。非正交 LCAO 的微小负投影是划分特征，不代表负物理态数。</p></div></div>
+        <details class="plan-details" open><summary>为什么只能说“调制”，暂不能证明“钝化”？</summary><div class="plan-detail-body">
+          <div class="table-scroll"><table class="model-table plan-table"><caption>比较各体系自身 E<sub>F</sub>；冻结 LRM B1 与界面 A 中对应投影。点值单位 states/eV/cell，窗口积分单位 states/cell；积分不是电荷差。</caption><thead><tr><th>指标</th><th>冻结 LRM B1</th><th>接触后 A</th><th>观察</th></tr></thead><tbody>
+            <tr><td>Mn-d：D(E<sub>F</sub>)</td><td>2.9772</td><td>2.0533</td><td>下降约 31.0%</td></tr>
+            <tr><td>LRM 相区：D(E<sub>F</sub>)</td><td>26.9028</td><td>19.2087</td><td>下降约 28.6%</td></tr>
+            <tr><td>Mn-d：[−0.5, 0] eV 积分</td><td>1.4271</td><td>1.5216</td><td>略增，并非所有窗口都降低</td></tr>
+            <tr><td>LRM 相区：[−0.5, 0] eV 积分</td><td>13.2800</td><td>15.8814</td><td>增加</td></tr>
+          </tbody></table></div>
+          <p class="plan-scope">E<sub>F</sub> 点下降是有限线索，不能概括为“整个近费米能区有害态减少”。冻结片段也不等于独立优化的裸 LRM 表面；磁态、参照几何、能量零点和归一化均需控制。O-p 主导及 LRM 占比本身不构成钝化证据。</p>
+        </div></details>
+        <div class="figure-grid figure-grid-dos">
+          <figure class="figure-card featured"><button class="image-button" data-src="../pdos_combined_d8f1704e_20261023/figures/tdos_matched.png" data-caption="TDOS：比较完整界面与冻结片段的总态密度"><img src="../pdos_combined_d8f1704e_20261023/figures/tdos_matched.png" alt="匹配后的总态密度" loading="lazy"></button><figcaption><b>TDOS：总态密度</b><span>上下自旋镜像；下方负号仅为显示约定</span></figcaption></figure>
+          <figure class="figure-card"><button class="image-button" data-src="../pdos_combined_d8f1704e_20261023/figures/pdos_elements.png" data-caption="元素分辨 PDOS：每种元素的所有角动量通道求和，不能直接等同于 O-p 等单一轨道"><img src="../pdos_combined_d8f1704e_20261023/figures/pdos_elements.png" alt="元素分辨 PDOS" loading="lazy"></button><figcaption><b>元素 PDOS</b><span>按元素加和全部轨道；用于定位主要元素</span></figcaption></figure>
+          <figure class="figure-card"><button class="image-button" data-src="../pdos_combined_d8f1704e_20261023/figures/pdos_orbitals.png" data-caption="轨道分辨 PDOS：观察 O-p 与过渡金属 d 态的能区重叠"><img src="../pdos_combined_d8f1704e_20261023/figures/pdos_orbitals.png" alt="轨道分辨 PDOS" loading="lazy"></button><figcaption><b>轨道 PDOS</b><span>界面 E<sub>F</sub> 处 O-p 85.6%、Mn-d 8.0%；重叠不能证明成键</span></figcaption></figure>
+          <figure class="figure-card"><button class="image-button" data-src="../pdos_combined_d8f1704e_20261023/figures/pdos_spin_resolved.png" data-caption="自旋分辨 PDOS：Mn-d 自旋不对称明显"><img src="../pdos_combined_d8f1704e_20261023/figures/pdos_spin_resolved.png" alt="自旋分辨 PDOS" loading="lazy"></button><figcaption><b>自旋 PDOS</b><span>两自旋分面绘制，非上下镜像；不对称反映当前磁性解</span></figcaption></figure>
+          <figure class="figure-card"><button class="image-button" data-src="../pdos_combined_d8f1704e_20261023/figures/pdos_interface_phases.png" data-caption="相区 PDOS：区分界面内 LRM/LPO 的轨道投影，并对比各自冻结片段"><img src="../pdos_combined_d8f1704e_20261023/figures/pdos_interface_phases.png" alt="界面相区 PDOS" loading="lazy"></button><figcaption><b>相区 PDOS</b><span>界面 E<sub>F</sub> 处按胞权重：LRM 74.8%、LPO 25.2%</span></figcaption></figure>
+        </div>
+        <div class="interpretation-row"><div class="callout callout-blue"><span class="callout-icon">↗</span><div><b>支持什么</b><p>当前展宽下，界面 E<sub>F</sub> 处 O-p 占主导；Mn-d 和 LRM 相区在各自 E<sub>F</sub> 处的谱权重下降。但窗口积分并非统一下降，只能确认电子态调制；“有害表面态被钝化”仍是待检验解释。</p></div></div><div class="callout callout-muted"><span class="callout-icon">!</span><div><b>仍需什么</b><p>先做共同能量对齐、同一表层原子的分层/原子 PDOS 及 k 点与展宽检查，识别所称“有害态”；若讨论成键，再补充 COHP/COOP 或 ELF 等证据。</p></div></div></div>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="conclusion">
+      <div class="wrap">
+        <div class="section-head dark-head"><div><p class="eyebrow">07 / CURRENT ANSWER</p><h2>目前能回答到哪里？</h2></div><p class="section-intro">把结论的强弱标出来，方便和老师讨论下一步需要补什么证据。</p></div>
+        <div class="answer-grid">
+          <div class="answer-card"><span class="answer-status partial">Q1 · 尚未确认</span><h3>能否形成稳定的局部界面？</h3><p>当前 SCF 收敛，但结构力收敛和配位验收尚未完成。需优化并检查短接触，才能讨论局部稳定结构；更广泛稳定性仍需构型比较。</p></div>
+          <div class="answer-card"><span class="answer-status supported">Q2 · 当前快照支持</span><h3>结合有利，存在方向性电荷重排</h3><p>面积归一化 E<sub>bind</sub> ≈ −1.047 J/m²；冻结分离功约 +1.047 J/m²。半空间约 0.224 e、Mulliken 约 0.16 e 均指向 LRM → LPO，数值依赖划分。</p></div>
+          <div class="answer-card"><span class="answer-status clue">Q3 · 调制有证据</span><h3>电子态变化明确，钝化待检验</h3><p>E<sub>F</sub> 处部分谱权重降低，但窗口积分未统一减少，尚未识别“有害表面态”；不能证明电子钝化已经发生。</p></div>
+          <div class="answer-card"><span class="answer-status partial">实验联系 · 待补证据</span><h3>尚不能解释性能改善的因果</h3><p>倍率、GITT 表观扩散系数和阻抗涉及离子输运、界面反应与电极过程，当前静态电子结构不能直接给出这些量。</p></div>
+        </div>
+        <blockquote class="takeaway">在当前冻结构型和计算参数下，LRM/LPO 接触相对冻结片段表现出能量降低倾向，空间积分与 Mulliken 布居均显示由 LRM 向 LPO 的净电子重排。DOS/PDOS 支持电子态发生调制；稳定界面和电子钝化仍需结构验收与针对性对照验证。</blockquote>
+      </div>
+    </section>
+
+    <section class="section wrap" id="limits">
+      <div class="section-head"><div><p class="eyebrow">08 / EVIDENCE BOUNDARY</p><h2>当前瓶颈</h2></div><p class="section-intro">这些限制决定了结果目前应该如何表述，也决定下一轮计算的优先级。</p></div>
+      <div class="limits-layout">
+        <div class="limit-list">
+          <div class="limit-item"><span class="limit-num">01</span><div><h3>结构优化与几何质量仍有问题</h3><p>Mulliken 重新分析报告记录约 1.68 Å 的异常短 TM—O 距离及表面重构；当前结果仅作快照探索。根因是单层 LRM 过薄、表面露裸 TM——两层重建与 50 步弛豫的进展见 09 节。负结合能不等于结构稳定。</p></div></div>
+          <div class="limit-item"><span class="limit-num">02</span><div><h3>电子结构收敛仍需加强</h3><p>k 点为 1×3×2，DOS 使用 0.05 eV 展宽，费米附近能级间隔很小，不能严格判定金属/半导体/绝缘体。</p></div></div>
+          <div class="limit-item"><span class="limit-num">03</span><div><h3>原子电荷与键合证据不完整</h3><p>已有 Mulliken 支持 LRM → LPO 的布居变化，但依赖基组；P 的 Bader 分区异常仍未解决。仍需可靠分区及 COHP/COOP 或 ELF 补充，不能直接指定氧化态或键型。</p></div></div>
+          <div class="limit-item"><span class="limit-num">04</span><div><h3>模型与实验尺度不同</h3><p>Li₃₅P₁₂O₄₈ 非晶片段只代表局部接触，不等同于完整 5 nm 包覆层，也不能直接给出 Li 迁移率或循环性能。</p></div></div>
+        </div>
+        <div class="boundary-card"><div class="boundary-icon">⌁</div><h3>结论的使用范围</h3><p>可以写成：</p><strong>“在当前冻结构型和计算参数下……”</strong><p class="small">不要写成：</p><strong class="muted-strong">“包覆层已经证明提高了倍率和 Li⁺ 扩散。”</strong><div class="boundary-rule"></div><p class="boundary-foot">每一个强结论都需要对应的结构、能量、电子态或动力学证据。</p></div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="model-iteration">
+      <div class="section-head"><div><p class="eyebrow">09 / MODEL ITERATION</p><h2>两层重建模型：与单层 LRM 的对比</h2></div><p class="section-intro">针对上面第 01 条瓶颈，把 LRM 从 1 个 (001) 周期加厚到 2 个周期（192 → 288 原子），在新模型上完成 50 个离子步的受约束 BFGS（leg1）并逐步审计 SCF。本节只用已归档的结构文件与作业日志，没有提交新计算。</p></div>
+      <div class="metric-grid">
+        <article class="metric-card metric-orange"><span class="metric-label">层状结构完整性</span><strong>8 × 24 <small>原子/层</small></strong><p>单层已无层界：48 个 O 连续分布 6.2 Å</p></article>
+        <article class="metric-card metric-blue"><span class="metric-label">相内 TM—O 中位键长</span><strong>1.887 → 1.959 <small>Å</small></strong><p>单层 54% 的键 &lt; 1.9 Å，两层 5%</p></article>
+        <article class="metric-card metric-purple"><span class="metric-label">跨相 &lt; 2.2 Å 接触</span><strong>6 → 0 <small>处</small></strong><p>最短 1.938 → 2.256 Å</p></article>
+        <article class="metric-card metric-teal"><span class="metric-label">LRM 原子跨度</span><strong>6.56 → 8.52 <small>Å</small></strong><p>单层为理想厚度 1.77 倍；两层 = 2 个周期</p></article>
+        <article class="metric-card metric-orange"><span class="metric-label">50 步后最大受力</span><strong>0.401 <small>eV/Å</small></strong><p>阈值 0.05 eV/Å · 仍未收敛</p></article>
+        <article class="metric-card metric-blue"><span class="metric-label">残余受力位置</span><strong>界面 TM 0.136 <small>eV/Å</small></strong><p>非晶 LPO 0.420 ＞ LRM 0.198 ＞ 界面 0.136</p></article>
+        <article class="metric-card metric-purple"><span class="metric-label">界面 TM 与磷酸根配位</span><strong>2 / 19</strong><p>50 步后仍是 2 个；界面几乎无力</p></article>
+        <article class="metric-card metric-teal"><span class="metric-label">50 步中 SCF 未收敛</span><strong>2 <small>步</small></strong><p>占 9.2 h，约整腿机时 41%</p></article>
+      </div>
+
+      <div class="evidence-block">
+        <div class="block-title"><div><span class="block-index">E</span><h3>模型对照 · 同一面内胞，不同 LRM 厚度</h3></div><span class="legend">距离按周期最小镜像 · TM 配位阈值 2.5 Å</span></div>
+        <div class="table-scroll"><table class="model-table plan-table"><caption>单层模型 = 本页 04–06 节结果所用的 A 体系；两层模型 = candB（LRM 2 个 (001) 周期 + 同一 LPO 块），界面面积与 W<sub>sep</sub> 口径可直接比较。</caption><thead><tr><th>项目</th><th>单层 LRM（1 个周期）</th><th>两层 LRM（2 个周期）</th><th>读法与边界</th></tr></thead><tbody>
+          <tr><td>LRM 切片</td><td>1 个 (001) 周期，d(001) = 4.798 Å</td><td>8.515 Å，8 个原子层（2 个周期）</td><td>只有两层模型存在可区分的体相内部区</td></tr>
+          <tr><td>LRM 原子数</td><td>96（理想 Li₂₉Mn₁₃Co₃Ni₃O₄₈）；冻结片段 97</td><td>192（Li₅₈Mn₂₆Co₆Ni₆O₉₆）</td><td>两层模型与体相计量一致；LPO 块相同</td></tr>
+          <tr><td>原子总数 / 可动</td><td>192 / 192</td><td>288 / 240（固定真空侧 48 个）</td><td>固定的是真空侧 O + Li 两层，非界面原子</td></tr>
+          <tr><td>真空侧终止面</td><td>初建时两个表面都露 3 配位裸 TM（19/19，CN = 3）</td><td>纯 O 面（24 个 O，无裸 TM）</td><td>终止面是单层模型结构失真的根源</td></tr>
+          <tr><td>磷酸侧终止面</td><td>薄层无法区分表面与内部</td><td>TM(+Li) 面（19 TM + 5 Li），由磷酸根 O 补配位</td><td>界面由 TM—O<sub>P</sub> 键连接</td></tr>
+          <tr><td>PO₄ 完整性</td><td>12/12（重建后；早期版本 7/12 断裂）</td><td>12/12，P—O 1.538–1.599 Å</td><td>两版都需按化学单元重切片才能保住</td></tr>
+          <tr><td>最短 TM—O</td><td>1.679 Å（已弛豫）</td><td>1.896 Å（初始、未弛豫）</td><td>阶段不同，只能说明初始几何已无异常短接触</td></tr>
+          <tr><td>TM 的 O 配位</td><td>{3: 6, 4: 11, 5: 2}（19 个 TM）</td><td>{3: 17, 4: 2, 6: 19}（38 个 TM）</td><td>阈值取 2.5 Å；取 2.6 Å 时三配位 TM 由 17 减为 16</td></tr>
+          <tr><td>跨相最短距离</td><td><b>1.938 Å</b>（LRM Mn — LPO O）</td><td><b>2.313 Å</b>（LRM Co — 磷酸根 O）</td><td>两层模型的间距来自几何筛选，不是手填参数</td></tr>
+          <tr><td>跨相接触计数</td><td>6 处 &lt; 2.2 Å；13 处 &lt; 3.0 Å</td><td>0 处 &lt; 2.2 Å；5 处 &lt; 3.0 Å</td><td>阈值是检查策略，不是通用成键判据</td></tr>
+          <tr><td>跨相阳离子 / O—O 最短</td><td>2.687 Å / 2.962 Å</td><td>2.854 Å / 2.995 Å</td><td>筛选条件为无阳离子 &lt; 2.6 Å、无 O—O &lt; 2.2 Å</td></tr>
+          <tr><td>面内胞 / 界面面积</td><td>10.0558 × 17.4022 Å → 174.99 Å²</td><td>10.0560 × 17.4025 Å → 175.00 Å²</td><td>同一面内胞，面积归一化结果可比</td></tr>
+          <tr><td>晶胞长度 / 真空</td><td>a = 38.82 Å；真空约 25.3 Å</td><td>a = 38.0 Å；真空 20.12 Å</td><td>真空均沿 a，面内周期</td></tr>
+          <tr><td>当前计算状态</td><td>三套静态 SCF 收敛（185 / 341 / 63 步）</td><td>50 离子步弛豫未收敛（0.401 eV/Å）</td><td>两者都还没有通过受力 + 配位验收</td></tr>
+        </tbody></table></div>
+        <p class="plan-scope">相归属口径：单层模型使用 Mulliken 重分析报告的相归属（192 原子，LRM 97 / LPO 95），并与该模型 STRU 逐原子核对（最大坐标偏差 1.6×10⁻⁵ Å，元素顺序一致）；两层模型按界面真空隙（8.55–10.30 Å）分为 LRM 192 + LPO 96，与建模说明一致。</p>
+      </div>
+
+      <div class="evidence-block">
+        <div class="block-title"><div><span class="block-index">F</span><h3>结构质量量化对照 · 50 步后两层到底好在哪、还差在哪</h3></div><span class="legend">周期最小镜像 · 相内 TM—O 阈值 2.5 Å</span></div>
+        <div class="table-scroll"><table class="model-table plan-table"><caption>左列为本页 04–06 节结果所用的单层模型（CG200，300 个离子步后）；右列为两层模型 50 个离子步后。两列都未通过受力验收；"相内 TM—O" 只统计 LRM 区内的 TM 与 O。</caption><thead><tr><th>结构判据</th><th>单层 192（300 步后）</th><th>两层 288（50 步后）</th><th>判断与依据</th></tr></thead><tbody>
+          <tr><td>层状结构完整性</td><td>已失去层界：48 个 O 连续分布在 6.2 Å 内，0.25 Å 直方图里没有任何一层能凑出 24 个原子</td><td>8 个亚层 × 24 原子；50 步后 7 层仍精确 24 个，仅界面 TM 层展开 0.55 Å</td><td>两层 ✓ 层状骨架未被破坏</td></tr>
+          <tr><td>LRM 原子中心跨度</td><td>6.56 Å（1 个周期理想 3.71 Å，实测 1.77 倍）</td><td>8.52 Å（2 个周期理想 8.51 Å）；50 步后 8.80 Å</td><td>两层 ✓ 厚度与周期一致</td></tr>
+          <tr><td>相内 TM—O 键长（&lt; 2.5 Å）</td><td>70 条：最短 1.679、中位 1.887 Å；38/70（54%）&lt; 1.9 Å</td><td>171 条：最短 1.843、中位 1.962 Å；9/171（5%）&lt; 1.9 Å</td><td>两层 ✓ 键长回到正常范围</td></tr>
+          <tr><td>真空侧表面</td><td>11 个 TM 迁移堆到表面区；裸 TM 面在弛豫中重构</td><td>纯 O 面、无金属暴露；固定两层，位移 0.000 Å</td><td>两层 ✓ 终止面受控</td></tr>
+          <tr><td>跨相最短距离</td><td>1.938 Å（Mn—O）</td><td>2.256 Å（Co—O，50 步后）</td><td>两层 ✓ 无异常短接触</td></tr>
+          <tr><td>跨相 &lt; 2.2 / &lt; 3.0 Å 接触数</td><td>6 / 13 处</td><td>0 / 5 处</td><td>两层 ✓</td></tr>
+          <tr><td>跨相阳离子 / O—O 最短</td><td>2.687 / 2.962 Å</td><td>2.944 / 3.151 Å（50 步中继续变大）</td><td>两层 ✓ 不是靠挤压达成</td></tr>
+          <tr><td>最大受力（可动分量）</td><td>0.216 eV/Å（300 步，全部原子可动）</td><td>0.401 eV/Å（50 步，240 个可动）</td><td>单层看似更低，见下条口径</td></tr>
+          <tr><td>界面 TM 与磷酸根成键</td><td>靠 1.94 Å 异常短接触"凑"出配位</td><td>19 个界面 TM 中只有 2 个有磷酸根 O &lt; 2.5 Å，50 步后仍为 2 个</td><td>都不够：两层"没成键"，单层"过度成键"</td></tr>
+        </tbody></table></div>
+        <div class="plan-equations"><p>残余受力归属（第 50 步日志最后一个 <code>TOTAL-FORCE</code> 块，eV/Å）：可动 240 个原子 max|F| = <b>0.420</b>（最大分量 0.400，与日志 0.4010 一致）；固定 48 个原子（真空侧 O + Li）max|F| = <b>1.115</b>（最大分量 0.947，被约束按住、不进入收敛判据）。</p><p>按区域分：<b>非晶 LPO 0.420 / 平均 0.143</b> ＞ <b>LRM 0.198 / 0.056</b> ＞ <b>19 个界面 TM 0.136 / 0.046</b>。</p><small>读法：两层模型"没跑完"的部分不在界面——界面 TM 已几乎无力，LRM 也接近松弛，残余受力主要由非晶 Li₃PO₄ 块内部的 Li—O 网络承担，另外真空侧被固定的 O 层本身带着 1.115 eV/Å 的受力。同时 19 个界面 TM 里只有 2 个与磷酸根 O 成键，说明在 gap 1.8 Å + 当前配准下，界面已接近局部极小，但那是"弱相互作用"的极小。</small></div>
+        <div class="interpretation-row"><div class="callout callout-blue"><span class="callout-icon">↗</span><div><b>是质变，不是数字变小</b><p>单层的低受力来自一个"层状塌掉 + 裸 TM 重构"的构型：TM—O 中位键长偏短、过半键 &lt; 1.9 Å、跨相压到 1.938 Å。两层把这些问题换成正常几何（层状完整、键长正常、无异常短接触），因此是更可信的起点。</p></div></div><div class="callout callout-orange"><span class="callout-icon">!</span><div><b>但"完成度"目前还不如单层</b><p>0.401 vs 0.216 eV/Å；但步数差 6 倍、算法不同（BFGS vs CG），不可直接比高低，且单层那个值是在已扭曲构型上的"力平衡"。下一步该动的是界面配置（间距、配准），而不是继续加步数。</p></div></div></div>
+      </div>
+
+      <div class="evidence-block">
+        <div class="block-title"><div><span class="block-index">G</span><h3>50 离子步弛豫 · 收敛审计</h3></div><span class="legend">任务 f5dd9050 · relax_nmax = 50 · force_thr = 0.05 eV/Å</span></div>
+        <div class="plan-equations"><p>ABACUS LTS v3.10.1；PBE+U（Mn 3.9 / Co 3.3 / Ni 6.2 eV）、D3(BJ)、100 Ry、Γ 1×3×2、nspin 2、固定晶胞；bfgs、relax_nmax = 50、force_thr_ev = 0.05、scf_thr = 1e−6、scf_nmax = 600、mixing_ndim = 16、mixing_restart = 5e−4；288 原子中 48 个固定。</p><small>末步最大受力 0.4010 eV/Å，是阈值的 8.0 倍；<code>Ion relaxation is converged</code> 从未出现。50 个离子步中 48 步 SCF 收敛，第 10、11 次撞满 scf_nmax = 600（末次 DRHO 4.03×10⁻⁵ / 3.94×10⁻⁵，单步能量跳变 3.15 / 79.93 eV）。这两个未收敛步的受力不可信，却仍被 BFGS 用于更新 Hessian 与搜索方向，其后 30 步的受力震荡至少部分属数值污染，不能直接当作物理势垒。</small></div>
+        <details class="plan-details" open><summary>最大受力轨迹：为什么说“步数用尽 ≠ 收敛”</summary><div class="plan-detail-body">
+          <div class="table-scroll"><table class="model-table plan-table"><caption>取自 <code>running_relax.log</code> 的 <code>Largest gradient in force</code>（eV/Å）；共 49 条记录，第 50 步写出最终 STRU</caption><thead><tr><th>离子步</th><th>1</th><th>2</th><th>5</th><th>10</th><th>15</th><th>19</th><th>25</th><th>30</th><th>35</th><th>41</th><th>45</th><th>49</th></tr></thead><tbody>
+            <tr><td>最大受力</td><td>4.0790</td><td>1.7560</td><td>1.6078</td><td>1.1898</td><td>0.6223</td><td>0.4620</td><td>0.4528</td><td>0.4790</td><td>0.4840</td><td>0.3550</td><td>0.6218</td><td>0.4010</td></tr>
+          </tbody></table></div>
+          <p class="plan-scope">前 15 步快速下降（4.0790 → 0.6223），此后进入长期平台：第 19–49 步始终在 0.355–0.622 之间震荡，30 步内没有进一步下降，全过程最小值 0.3550 eV/Å（第 41 步）。因此“50 步跑完”只说明步数预算用完，几何尚未进入收敛区。</p>
+        </div></details>
+        <details class="plan-details"><summary>机时分布：两个未收敛步吃掉了 41% 的算力</summary><div class="plan-detail-body">
+          <div class="table-scroll"><table class="model-table plan-table"><caption>逐个离子步的 SCF 用时统计（整腿 80831 s）</caption><thead><tr><th>项目</th><th>数值</th><th>说明</th></tr></thead><tbody>
+            <tr><td>SCF 总用时 / 整腿</td><td>45177 s / 80831 s</td><td>SCF 占 56%，其余为力、Hessian 与 IO</td></tr>
+            <tr><td>两个未收敛步用时</td><td>33100 s ≈ 9.2 h</td><td>约占整腿 41%，且结果不可用</td></tr>
+            <tr><td>单步 SCF 中位用时</td><td>933 s</td><td>常规步分布很宽（约 11–36 min）</td></tr>
+            <tr><td>前 / 后期单步用时</td><td>约 1720 s → 约 700 s</td><td>几何越松弛，SCF 越便宜，约 2.3 倍</td></tr>
+          </tbody></table></div>
+          <p class="plan-scope">单一离子步的 SCF 用时呈双峰分布：常规步 11–36 min，偶发步可达 4.6 h 且仍不收敛。想省机时应改善起点与混合策略，而不是放宽收敛阈值——后者会让“未收敛步”直接混入轨迹。</p>
+        </div></details>
+        <details class="plan-details"><summary>50 步后几何与局部结构变了什么？</summary><div class="plan-detail-body">
+          <div class="table-scroll"><table class="model-table plan-table"><caption>位移按周期最小镜像；48 个固定原子位移为 0</caption><thead><tr><th>指标</th><th>初始</th><th>50 步后</th></tr></thead><tbody>
+            <tr><td>最大受力 / eV Å⁻¹</td><td>4.0790</td><td>0.4010</td></tr>
+            <tr><td>可动原子位移</td><td>—</td><td>平均 0.188 Å，最大 1.002 Å；18 个 &gt; 0.5 Å</td></tr>
+            <tr><td>最短 TM—O / Å</td><td>1.896</td><td>1.843</td></tr>
+            <tr><td>最短 Li—O / Å</td><td>1.831</td><td>1.766</td></tr>
+            <tr><td>TM 的 O 配位（&lt; 2.6 Å）</td><td>{3: 17, 4: 2, 6: 19}</td><td>{3: 16, 4: 3, 6: 19}</td></tr>
+            <tr><td>PO₄ 完整数</td><td>12 / 12</td><td>12 / 12</td></tr>
+          </tbody></table></div>
+          <p class="plan-scope">50 步内磷酸根未被破坏、固定层未移动，界面区仅有轻微重排；但界面 TM 的配位几乎没变（只有 1 个三配位 TM 补到 4 配位），说明界面成键网络在 50 步内并未真正重建完成。</p>
+        </div></details>
+        <div class="interpretation-row"><div class="callout callout-orange"><span class="callout-icon">↗</span><div><b>支持什么</b><p>两层重建在几何上确实修掉了单层模型的硬伤：纯 O 面终止、12/12 磷酸根、面内零失配、跨相不再有 &lt; 2.2 Å 接触，最短跨相距离由 1.938 Å 回到 2.313 Å。</p></div></div><div class="callout callout-muted"><span class="callout-icon">!</span><div><b>不能支持什么</b><p>两层模型本身也没有收敛：末步最大受力仍是阈值的 8 倍，且轨迹里有两步 SCF 未收敛。因此它目前只能作为“改进后的结构起点”，不能称为平衡界面，也不能由它给出界面能或新的电子结构结论。</p></div></div></div>
+      </div>
+
+      <div class="evidence-block">
+        <div class="block-title"><div><span class="block-index">H</span><h3>预优化与跨几何暖启动：几何能沿用，电子解不能</h3></div></div>
+        <div class="plan-equations"><p>DPA4-Neo 预优化（同一 candB 起点）：可动原子平均位移 <b>0.642 Å</b>、最大 2.559 Å、106 个 &gt; 0.5 Å；界面 TM 的 O 配位由 {3: 17, 4: 2, 6: 19} 变为 {3: 9, 4: 7, 5: 3, 6: 19}；磷酸根仍 12/12。</p><p>用 leg1 第 50 步的电荷密度与 <code>onsite.dm</code> 去算 DPA4 几何的 DFT 单点：249 次迭代后 DRHO 从未低于 2×10⁻²（目标 10⁻⁶），总能跨度约 2000 eV、单步最大跳变 5658 eV，2.21 h 后仍未收敛而停止。</p><small>判读：低成本预优化能减少 DFT 离子步数、给 DFT 一个好起点，但它改变了界面 TM 的配位网络；DFT+U 的占据矩阵与准金属费米面（D(E<sub>F</sub>) = 25.69 states/eV/cell）使跨几何的电子解错配。续算 leg2 已按单变量原则重提——相对 leg1 只有 <code>uramping = 1.0</code> 一处物理/数值改动（scf_nmax 600、mixing_ndim 16 均保持），提交记录中仍在运行，本页不引用其结果。</small></div>
+      </div>
+
+      <div class="limits-layout">
+        <div class="limit-list">
+          <div class="limit-item"><span class="limit-num">01</span><div><h3>薄层不能用“少放原子”换便宜</h3><p>单层 LRM 只有 1 个 (001) 周期、没有体相内部区，两个表面都是 3 配位裸 TM；弛豫后 LRM 被扭曲（TM—O 1.679 Å、跨相出现 6 处 &lt; 2.2 Å 接触）。这正是“当前瓶颈”第 01 条的来源。</p></div></div>
+          <div class="limit-item"><span class="limit-num">02</span><div><h3>先修几何，再谈收敛参数</h3><p>两层模型的所有改善——纯 O 面终止、12/12 磷酸根、面内零失配、无异常短接触、最短 TM—O 由 1.679 回到 1.896 Å——全部来自建模与几何筛选，没有一条来自调整 SCF 或弛豫参数。</p></div></div>
+          <div class="limit-item"><span class="limit-num">03</span><div><h3>电子收敛 ≠ 结构收敛</h3><p>50 步里 48 步 SCF 达标，但最大受力只降到 0.401 eV/Å；第 19 步后长期停在 0.355–0.622 的平台，30 步没有进展。汇报里必须把“SCF 收敛”和“结构验收”分开写。</p></div></div>
+          <div class="limit-item"><span class="limit-num">04</span><div><h3>必须逐步审计 SCF，否则污染步会伪装成物理解</h3><p>第 10、11 次 SCF 撞满 600 步不收敛（末次 DRHO ≈ 4×10⁻⁵、单步能量跳 79.9 eV），这两步的受力仍被 BFGS 使用。现已把“每步 SCF 是否收敛”做成自动审计并写入后续任务的预注册判据。</p></div></div>
+          <div class="limit-item"><span class="limit-num">05</span><div><h3>机时杠杆是更好的起点，不是更松的阈值</h3><p>两个未收敛步占 9.2 h（整腿 41%）；几何越松弛、单步 SCF 越便宜（约 1720 s → 约 700 s，2.3 倍）。因此“低成本预优化 + DFT 精修”比放宽收敛阈值划算，前提是电子解必须重新自洽而不是跨几何搬运。</p></div></div>
+          <div class="limit-item"><span class="limit-num">06</span><div><h3>一次只改一个物理变量</h3><p>leg2 相对 leg1 只动 <code>uramping</code>，便于归因；与早期“一次改多项参数、失败后无法定位”的做法相反。每个任务都应预注册验收判据与后备方案。</p></div></div>
+          <div class="limit-item"><span class="limit-num">07</span><div><h3>残余受力的位置会告诉你下一步该改什么</h3><p>50 步后界面 TM 只剩 0.136 eV/Å、LRM 0.198，受力集中在非晶 Li₃PO₄ 块（0.420）。继续加步数主要在“磨非晶应变”，真正的杠杆是界面配置（间距、配准）；真空侧被固定的 O 层带着 1.115 eV/Å 受力，属于建模代价，相关表面量的结论不能用这一层。</p></div></div>
+        </div>
+        <div class="boundary-card"><div class="boundary-icon">⌁</div><h3>本节的口径</h3><p>单层的 1.679 Å 是<b>弛豫后</b>几何，两层的 1.896 Å 是<b>未弛豫</b>初始几何，阶段不同，只用于说明“初始几何已无异常短接触”。</p><div class="boundary-rule"></div><p>跨相接触计数依赖相归属划分与阈值（2.2 / 2.6 / 3.0 Å 是检查策略，不是通用成键判据）。TM 配位阈值 2.5 Å 与 2.6 Å 会差 ±1 个原子，本文已分别标注。</p><p class="boundary-foot">本节不给出任何新的结合能、电荷或 DOS 数值；两层模型仍需通过受力与配位验收后才能复算。</p></div>
+      </div>
+
+      <div class="model-verdict"><b>本节结论：两层是“更可信的起点”，还不是“更好的界面结构”</b><p>从结构上看这是<b>质变</b>：层状骨架完整（8 个亚层 × 24 原子）、TM—O 键长回到正常（中位 1.962 Å，仅 5% 的键 &lt; 1.9 Å）、跨相无异常短接触（最短 2.256 Å，0 处 &lt; 2.2 Å）、终止面与化学计量受控、LRM 厚度等于 2 个周期。</p><p>但 50 个离子步只跑到 <strong>0.401 eV/Å</strong>（阈值的 8 倍），而且残余受力不在界面：界面 TM 仅 0.136 eV/Å，受力集中在非晶 Li₃PO₄ 块（0.420）与真空侧被固定的 O 层（1.115，建模代价）。同时 19 个界面 TM 中只有 2 个与磷酸根 O 成键（&lt; 2.5 Å），50 步后仍是 2 个——所以当前配置说明的是“<strong>界面在 gap 1.8 Å + 该配准下相互作用很弱</strong>”，而不是“结合更强”。</p><p>对已有结果的影响：单层的 −1.047 J/m²、0.224 e 与 DOS 调制仍然成立，但必须注明它们来自含 <strong>1.938 Å 跨相短接触</strong>的快照，量值有被高估的风险；两层模型要先把结构跑到验收（受力 ≤ 0.05 eV/Å、每步 SCF 达标、界面配位复核），才谈得上替换那一组数字。</p></div>
+
+      <div class="hero-actions mulliken-actions"><a class="btn btn-ghost" href="%E6%A8%A1%E5%9E%8B%E8%BF%AD%E4%BB%A3%E4%B8%8E50%E6%AD%A5%E5%BC%9B%E8%B1%AB%E5%AE%A1%E8%AE%A1_20261027.md" download>下载本节完整记录（含来源路径）↓</a></div>
+    </section>
+
+    <section class="section section-tinted" id="roadmap">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">10 / NEXT COMPUTATION</p><h2>下一步计算路线</h2></div><p class="section-intro">本阶段先完成上传方案中的优化与统一后处理；构型扩展、键合和迁移计算作为进一步研究。</p></div>
+        <div class="plan-banner"><div><b>方法讨论：ML势与主动学习</b><p>说明单个初始界面怎样进入ML预优化、DFT抽样与结构验收，以及这条路线目前还缺哪些证据。</p></div><a class="btn btn-ghost" href="mlip-active-learning.html">打开讨论页 <span aria-hidden="true">↗</span></a></div>
+        <div class="roadmap">
+          <div class="road-step"><div class="road-node">01</div><div><span class="road-label">结构可靠性 · 本阶段优先</span><h3>优化并验收已有界面</h3><p>在两层重建模型（288 原子，见 09 节）上把最大受力跑到 0.05 eV/Å 以下，核对异常短距离与局部配位，并统一 Li 原子归属；单层 192 原子模型只用来说明当前结果快照。</p></div></div>
+          <div class="road-step"><div class="road-node">02</div><div><span class="road-label">电子结构</span><h3>重新 SCF + 能量对齐</h3><p>对验收结构重做三套 SCF、结合能、差分密度和布居；测试面内 k 点、基组、磁态与展宽，再做平面平均电势及可用的真空能级对齐。</p></div></div>
+          <div class="road-step"><div class="road-node">03</div><div><span class="road-label">键合与钝化</span><h3>把“线索”变成可核对证据</h3><p>做 LRM 表层/次表层 PDOS、原子分辨 PDOS、COHP/COOP、ELF 和验证后的 Bader/DDEC。</p></div></div>
+          <div class="road-step"><div class="road-node">04</div><div><span class="road-label">实验机制</span><h3>连接倍率、GITT 与阻抗</h3><p>构建 Li 空位/迁移路径做 NEB，评估界面离子输运和电子输运，再与裸 LRM 对照。</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="files">
+      <div class="section-head"><div><p class="eyebrow">11 / SOURCE FILES</p><h2>报告与数据</h2></div><p class="section-intro">网页内容于 2026.10.27 核对。历史报告保留原文，其中结论措辞以本页审核后的证据边界为准；上传方案与已有结果的分组差异仍需统一。</p></div>
+      <div class="file-grid">
+        <a class="file-card" href="%E5%86%85%E5%AE%B9%E4%B8%8E%E6%B1%87%E6%8A%A5%E9%80%BB%E8%BE%91%E5%AE%A1%E6%A0%B8_20261027.md" download><span class="file-icon">MD</span><span><b>网页内容与汇报逻辑审核记录</b><small>数值核验、修正项与未解决问题</small></span><span class="file-arrow">↓</span></a>
+        <a class="file-card" href="%E6%A8%A1%E5%9E%8B%E8%BF%AD%E4%BB%A3%E4%B8%8E50%E6%AD%A5%E5%BC%9B%E8%B1%AB%E5%AE%A1%E8%AE%A1_20261027.md" download><span class="file-icon">MD</span><span><b>模型迭代与 50 步弛豫审计</b><small>单层 / 两层结构质量对照、残余受力归属与教训</small></span><span class="file-arrow">↓</span></a>
+        <a class="file-card" href="docs/LRM-LPO_ABACUS_plan.md" download><span class="file-icon">MD</span><span><b>LRM—非晶 Li₃PO₄ ABACUS 计算方案</b><small>上传原文：模型、统一参数、流程与验收</small></span><span class="file-arrow">↓</span></a>
+        <a class="file-card" href="mlip-active-learning.html"><span class="file-icon">ML</span><span><b>机器学习势与主动学习讨论页</b><small>路线逻辑、单结构采样和DFT验收</small></span><span class="file-arrow">↗</span></a>
+        <a class="file-card" href="../Mulliken%E7%94%B5%E8%8D%B7%E9%87%8D%E6%96%B0%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A_d8f1704e_20261027.md" download><span class="file-icon">MD</span><span><b>Mulliken 电荷重新分析报告</b><small>2026.10.27 · 原子匹配、布居变化及解释边界</small></span><span class="file-arrow">↓</span></a>
+        
+        
+        
+        
+        <a class="file-card" href="../%E8%AE%A1%E7%AE%97%E6%96%B9%E6%A1%88%E4%B8%8E%E9%98%B6%E6%AE%B5%E7%BB%93%E6%9E%9C%E6%B1%87%E6%8A%A5%E5%A4%A7%E7%BA%B2.md"><span class="file-icon">MD</span><span><b>计算方案与阶段结果汇报大纲</b><small>总体路线、结果与后续计划</small></span><span class="file-arrow">↗</span></a>
+        <a class="file-card" href="../%E4%B8%8E%E8%80%81%E5%B8%88%E8%AE%A8%E8%AE%BA_%E7%95%8C%E9%9D%A2%E7%94%B5%E5%AD%90%E7%BB%93%E6%9E%84%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%90%8E%E7%BB%AD%E8%AE%A1%E7%AE%97%E6%80%9D%E8%B7%AF.md"><span class="file-icon">MD</span><span><b>与老师讨论：界面电子结构</b><small>可支持/不可支持的结论边界</small></span><span class="file-arrow">↗</span></a>
+        <a class="file-card" href="../charge_difference_d8f1704e_20261023/%E5%B7%AE%E5%88%86%E7%94%B5%E8%8D%B7%E5%AF%86%E5%BA%A6%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A_%E5%AE%8C%E6%95%B4%E7%89%88.md"><span class="file-icon">MD</span><span><b>差分电荷密度分析报告</b><small>积分、图像与误差边界</small></span><span class="file-arrow">↗</span></a>
+        <a class="file-card" href="../pdos_combined_d8f1704e_20261023/DOS_PDOS_%E8%81%94%E5%90%88%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A.md"><span class="file-icon">MD</span><span><b>DOS / PDOS 联合分析报告</b><small>TDOS、轨道、自旋和相区</small></span><span class="file-arrow">↗</span></a>
+        <div class="file-card"><span class="file-icon file-icon-cube">∿</span><span><b>差分电荷 cube 原始数据</b><small>公开展示包仅含图像与报告；cube 原始数据未打包。</small></span></div>
+        <a class="file-card" href="../charge_difference_d8f1704e_20261023/VESTA_cubes/README_%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md"><span class="file-icon file-icon-cube">V</span><span><b>VESTA 绘图说明</b><small>等值面与边界设置</small></span><span class="file-arrow">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap footer-inner"><div><b>LRM × Li₃PO₄</b><span>局部界面计算成果展示</span></div><div class="footer-meta">Frozen interface model · SCF converged · Evidence-led</div></div></footer>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图像放大查看" aria-hidden="true"><button class="lightbox-close" aria-label="关闭">×</button><img id="lightbox-img" alt=""><p id="lightbox-caption"></p></div>
+  <script src="app.js"></script>
+</body>
+</html>

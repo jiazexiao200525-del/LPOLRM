@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="面向288原子两层LRM/非晶Li3PO4异质结的DPA4 高参数 checkpoint主动学习和DFT受力验收实施细节。">
+  <title>DPA4 高参数 checkpoint 技术实施路线 | LRM × Li₃PO₄</title>
+  <style>
+    :root{--ink:#182c34;--muted:#60727a;--line:#d7e1e2;--paper:#f3f6f5;--white:#fff;--teal:#087f78;--teal-soft:#dff1ed;--rust:#ad4c2d;--rust-soft:#f8e8df;--blue:#386384;--blue-soft:#e6eef3;--dark:#14353b;--lime:#d7e58a;--radius:6px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:86px}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Aptos","Segoe UI","Microsoft YaHei",sans-serif;line-height:1.7}a{color:inherit}.wrap{width:min(1120px,calc(100% - 44px));margin:0 auto}.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 max(22px,calc((100vw - 1120px)/2));min-height:62px;background:rgba(243,246,245,.97);border-bottom:1px solid var(--line)}.brand{font-size:11px;font-weight:800;text-decoration:none;white-space:nowrap}.brand span{color:var(--teal)}.nav{display:flex;gap:16px;align-items:center;font-size:11px;font-weight:700}.nav a{color:var(--muted);text-decoration:none;white-space:nowrap}.nav a:hover{color:var(--teal)}.back{padding:7px 10px;border:1px solid var(--line);border-radius:var(--radius);background:white;text-decoration:none;font-size:10px;font-weight:700;white-space:nowrap}.hero{padding:54px 0 34px}.eyebrow{margin:0 0 9px;color:var(--teal);font-size:10px;font-weight:900;letter-spacing:.1em}.hero-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:40px;align-items:end}.hero h1{max-width:770px;margin:0;color:var(--dark);font-size:42px;line-height:1.18}.lead{max-width:760px;margin:17px 0 0;color:var(--muted);font-size:15px}.hero-facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}.hero-facts div{padding:13px;background:#fff}.hero-facts b{display:block;color:var(--dark);font-size:18px}.hero-facts span{display:block;color:var(--muted);font-size:10px}.route-band{background:var(--dark);color:#f0f6f3}.route-inner{display:grid;grid-template-columns:repeat(7,1fr);align-items:stretch;gap:0;padding:16px 0}.route-node{position:relative;padding:12px 11px;border-top:3px solid var(--teal);background:rgba(255,255,255,.04)}.route-node:nth-child(3),.route-node:nth-child(5){border-color:var(--rust)}.route-node b{display:block;color:var(--lime);font-size:10px}.route-node span{display:block;margin-top:4px;font-size:11px;font-weight:700;line-height:1.35}.route-node:not(:last-child):after{content:"›";position:absolute;right:-7px;top:28px;z-index:1;color:var(--lime);font-size:20px;font-weight:800}.section{padding:55px 0}.section.alt{background:#e9efee}.section.dark{background:var(--dark);color:#f1f7f5}.section-head{display:flex;justify-content:space-between;align-items:end;gap:26px;margin-bottom:24px}.section-head h2{margin:0;color:var(--dark);font-size:26px;line-height:1.25}.dark .section-head h2{color:#f1f7f5}.intro{max-width:480px;margin:0;color:var(--muted);font-size:12px}.dark .intro{color:#b8c9c7}.tag{display:inline-block;margin-right:7px;padding:2px 7px;border-radius:3px;background:var(--teal-soft);color:#075952;font-size:9px;font-weight:800;vertical-align:2px}.tag.warn{background:var(--rust-soft);color:#783c27}.tag.neutral{background:var(--blue-soft);color:#315472}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{padding:20px;border:1px solid var(--line);background:#fff;border-radius:var(--radius)}.panel h3{margin:0 0 9px;font-size:15px}.panel p,.panel li{color:var(--muted);font-size:12px}.panel p{margin:6px 0}.panel ul{margin:8px 0 0;padding-left:18px}.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:15px}.metric{padding:14px;border-top:3px solid var(--teal);background:#fff}.metric:nth-child(2){border-color:var(--rust)}.metric:nth-child(3){border-color:var(--blue)}.metric:nth-child(4){border-color:#8b8236}.metric b{display:block;color:var(--dark);font-size:19px}.metric span{display:block;color:var(--muted);font-size:10px}.stage-list{display:grid;gap:10px}.stage{display:grid;grid-template-columns:72px 1fr;gap:18px;padding:17px 19px;background:#fff;border-left:3px solid var(--teal)}.stage:nth-child(2n){border-color:var(--rust)}.stage-id{color:var(--teal);font-size:10px;font-weight:900}.stage h3{margin:0 0 5px;font-size:14px}.stage p{margin:4px 0;color:var(--muted);font-size:11px}.stage .why{color:#43575d}.columns{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}.timeline{margin:0;padding:0;list-style:none;counter-reset:steps}.timeline li{counter-increment:steps;display:grid;grid-template-columns:28px 1fr;gap:11px;padding:13px 0;border-top:1px solid var(--line)}.timeline li:before{content:"0" counter(steps);color:var(--rust);font-size:10px;font-weight:900}.timeline b{font-size:12px}.timeline p{margin:3px 0;color:var(--muted);font-size:11px}.dark-card{padding:20px;background:var(--dark);color:#f3f7f6;border-radius:var(--radius)}.dark-card h3{margin:0 0 10px;font-size:15px}.dark-card p,.dark-card li{color:#c2d2cf;font-size:11px}.dark-card ul{padding-left:18px}.table-scroll{overflow:auto}table{width:100%;border-collapse:collapse;background:#fff;font-size:11px}th,td{padding:11px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:#dfe9e7;color:var(--dark)}td{color:var(--muted)}td:first-child{font-weight:800;color:var(--ink)}.code{overflow:auto;padding:15px 17px;background:#152e34;color:#e4efec;border-radius:var(--radius);font:11px/1.55 Consolas,"Courier New",monospace;white-space:pre}.callout{margin-top:16px;padding:14px 16px;border-left:3px solid var(--rust);background:var(--rust-soft);color:#693b2a;font-size:11px}.callout b{color:#4e2b20}.gates{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.gate{padding:17px;background:#fff;border-top:3px solid var(--teal)}.gate:nth-child(2){border-color:var(--rust)}.gate:nth-child(3){border-color:var(--blue)}.gate h3{margin:6px 0;font-size:13px}.gate p{margin:0;color:var(--muted);font-size:11px}.gate small{color:var(--muted);font-size:9px;font-weight:900}.decision{display:grid;grid-template-columns:1fr 1fr;gap:14px}.decision article{padding:18px;background:rgba(255,255,255,.06);border-top:2px solid var(--teal)}.decision article:last-child{border-color:var(--rust)}.decision h3{margin:0 0 7px;font-size:14px}.decision p{margin:0;color:#c1d1cf;font-size:11px}.footer{padding:20px 0;border-top:1px solid var(--line);background:white;color:var(--muted);font-size:10px}.footer-inner{display:flex;justify-content:space-between;gap:18px}.footer a{color:var(--teal);font-weight:800;text-decoration:none}
+    @media(max-width:850px){.nav{gap:9px;font-size:9px}.hero-grid,.columns{grid-template-columns:1fr}.route-inner{grid-template-columns:repeat(4,1fr);gap:5px}.route-node:after{display:none}.metric-row{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.wrap{width:calc(100% - 30px)}.topbar{padding:8px 15px;min-height:55px;flex-wrap:wrap}.brand{font-size:9px}.nav{order:3;width:100%;overflow:auto;padding:2px 0 5px}.back{font-size:9px}.hero{padding:37px 0 27px}.hero h1{font-size:32px}.lead{font-size:13px}.section{padding:40px 0}.section-head{display:block}.section-head h2{font-size:22px}.intro{margin-top:9px}.route-inner{grid-template-columns:repeat(2,1fr)}.grid2,.gates,.decision{grid-template-columns:1fr}.stage{grid-template-columns:48px 1fr;gap:10px;padding:14px}.metric-row{gap:7px}.metric{padding:11px}.metric b{font-size:17px}.footer-inner{display:block}.footer-inner span{display:block;margin-top:5px}}
+    @media print{.topbar{position:static}.back{display:none}.section{padding:28px 0}.panel,.stage,.gate,.metric,.dark-card{break-inside:avoid}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">INTERFACE LAB <span>/</span> LRM × Li₃PO₄</a>
+    <nav class="nav" aria-label="技术实施路线目录">
+      <a href="#scope">对象</a><a href="#preflight">预检</a><a href="#sampling">选帧</a><a href="#labels">DFT标签</a><a href="#training">微调</a><a href="#acceptance">验收</a>
+    </nav>
+    <a class="back" href="mlip-execution-plan.html">查看执行方案</a>
+  </header>
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow">IMPLEMENTATION DETAIL / 2026.10.29</p>
+      <div class="hero-grid">
+        <div>
+          <h1>让 DPA4 高参数 checkpoint 帮助完成<br>两层 LRM/LPO 结构优化</h1>
+          <p class="lead">目标是降低 288 原子异质结直接 DFT 弛豫的成本。DPA4 高参数 checkpoint 负责高频几何搜索，主动学习把少量、收敛的 ABACUS PBE+U 能量与力标签补到优化路径上，最终仍由 DFT 单点受力决定结构能否进入电子性质计算。</p>
+        </div>
+        <div class="hero-facts" aria-label="本项目模型参数">
+          <div><b>288</b><span>总原子数</span></div><div><b>240 / 48</b><span>可动 / 固定原子</span></div>
+          <div><b>0.401</b><span>DFT 50 步后最大受力 eV/Å</span></div><div><b>≤ 0.05</b><span>项目几何验收标准 eV/Å</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="route-band" aria-label="流程总览"><div class="wrap route-inner">
+      <div class="route-node"><b>01 · LOCK</b><span>固定模型与原子映射</span></div><div class="route-node"><b>02 · PREFLIGHT</b><span>核验 checkpoint 与接口</span></div><div class="route-node"><b>03 · EXPLORE</b><span>ML 优化并保留轨迹</span></div><div class="route-node"><b>04 · QUERY</b><span>选少量高信息帧</span></div><div class="route-node"><b>05 · LABEL</b><span>DFT 计算能量和力</span></div><div class="route-node"><b>06 · UPDATE</b><span>微调后重新优化</span></div><div class="route-node"><b>07 · ACCEPT</b><span>DFT 单点受力验收</span></div>
+    </div></section>
+
+    <section class="section wrap" id="scope">
+      <div class="section-head"><div><p class="eyebrow">01 / FIX THE QUESTION</p><h2>先锁定这次要解决的计算问题</h2></div><p class="intro">当前阶段只处理既有两层界面的坐标优化，不同时改变界面组成、晶面、终止面、面内晶胞和固定层策略。</p></div>
+      <div class="grid2">
+        <article class="panel"><h3>固定的对象</h3><p><span class="tag">项目记录</span>LRM 两层 + 非晶 Li₃PO₄；288 原子；240 个可动原子、48 个固定原子；第一阶段固定晶胞。</p><p>开始前必须从实际 STRU/CIF 读取原子编号和约束，不能仅凭旧报告重建固定原子映射。</p></article>
+        <article class="panel"><h3>固定的标签方法</h3><p><span class="tag">目标 DFT</span>沿用项目的 ABACUS PBE+U、自旋极化、Mn/Co/Ni 的既定 U、D3(BJ)、赝势/轨道和数值精度。</p><p>训练标签与最终单点验收应对应同一势能面；磁态或电子态不同的结果不能未经区分地混在一起。</p></article>
+      </div>
+      <div class="metric-row"><div class="metric"><b>288</b><span>界面原子数</span></div><div class="metric"><b>240</b><span>优化自由原子</span></div><div class="metric"><b>48</b><span>需保持固定</span></div><div class="metric"><b>≤0.05</b><span>DFT 最大力分量 eV/Å</span></div></div>
+      <div class="callout"><b>重要区分：</b>旧归档里的预优化模型名为 DPA4-Neo；本页方案针对用户提供的 DPA4 高参数 checkpoint。没有哈希或运行记录证明两者相同，因此旧的 0.642 Å 位移统计不作为 DPA4 高参数 checkpoint 的性能验证。</div>
+    </section>
+
+    <section class="section alt" id="preflight">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">02 / MODEL PREFLIGHT</p><h2>先证明模型“能正确运行”</h2></div><p class="intro">checkpoint 可加载只是软件检查通过，不等于对 LRM/LPO 化学环境有效。先做小规模输入输出核验，再启动整条优化。</p></div>
+        <div class="stage-list">
+          <article class="stage"><div class="stage-id">GATE 0</div><div><h3>固定模型身份</h3><p>对 `&lt;DPA4_MAX_PARAMS_CHECKPOINT&gt;` 保存 SHA-256：`待实际文件到位后计算`，记录文件来源、DeepMD-kit 与 PyTorch 版本。</p><p class="why"><b>理由：</b>保证模型、微调产物与后续结构能够追溯，避免不同 checkpoint 被当成同一个模型。</p></div></article>
+          <article class="stage"><div class="stage-id">GATE 1</div><div><h3>核验元素映射与单位</h3><p>模型类型映射包含 Li、P、O、Mn、Co、Ni；逐项核对程序中的 type_map、STRU 原子顺序、晶胞、周期边界、坐标/能量/力单位和 48 个固定原子编号。</p><p class="why"><b>理由：</b>错误的元素编号或单位会生成数值上可运行、物理上错误的力。</p></div></article>
+          <article class="stage"><div class="stage-id">GATE 2</div><div><h3>检查 DPA4 特有输入</h3><p>确认当前 checkpoint 是否需要原子 spin/charge 输入、接口是否支持能量和力推理、是否支持 PyTorch 微调及 LoRA；记录模型卡中能核实的训练参考方法和已知精度。</p><p class="why"><b>理由：</b>过渡金属磁性与 DFT+U 会影响局部势能面，不能从元素覆盖或字段名称推断模型已学到本项目的磁态。</p></div></article>
+        </div>
+        <div class="callout"><b>当前状态：</b>静态 checkpoint 检查已完成；项目环境之前未发现 `torch` 与 `deepmd`，实际推理、checkpoint 兼容性及微调接口仍待验证。先在隔离环境完成预检，不要直接覆盖 ABACUS 环境。</div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="explore">
+      <div class="section-head"><div><p class="eyebrow">03 / ML EXPLORATION</p><h2>用原始 DPA4 高参数 checkpoint 做受控预优化</h2></div><p class="intro">第一条轨迹的价值是暴露模型在当前结构附近会怎样移动原子，并形成主动学习候选，不是直接产出最终结构。</p></div>
+      <div class="columns">
+        <ol class="timeline">
+          <li><div><b>输入冻结的两层结构</b><p>使用经过核对的 288 原子文件；不重新排序元素、不改晶胞、不改变固定层。</p></div></li>
+          <li><div><b>先做单帧力预测</b><p>核验能量/力为有限值，固定原子受力不会推动坐标变化，并抽查界面附近力的方向和大小。</p></div></li>
+          <li><div><b>运行短程坐标优化</b><p>限制每步最大位移，分段运行；每个优化阶段输出坐标、能量、逐原子力和优化器状态。</p></div></li>
+          <li><div><b>执行结构事件审计</b><p>追踪 TM–O、Li–O、P–O 和 O–O 距离，界面配位数、PO₄ 完整性、LRM 层间距及原子位移。</p></div></li>
+        </ol>
+        <aside class="dark-card"><h3>首轮需要保存</h3><ul><li>每步结构或可无损恢复的轨迹</li><li>总能量、逐原子力与最大受力</li><li>原子映射、约束和模型哈希</li><li>局部配位与异常几何审计</li><li>优化终止原因和软件版本</li></ul><p>能量跳变、位移突增、异常短接触、P–O 拉长或 LRM 骨架破坏的帧，标记为高风险，先检查再决定是否做 DFT。</p></aside>
+      </div>
+    </section>
+
+    <section class="section alt" id="sampling">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">04 / QUERY SELECTION</p><h2>从一条轨迹里选“有新信息”的帧</h2></div><p class="intro">选择依据是结构或预测发生了实质变化，而不是固定每隔若干步取一帧。相邻帧高度相关，逐帧做 DFT 会产生大量冗余标签。</p></div>
+        <div class="table-scroll"><table><thead><tr><th>优先帧</th><th>首轮建议</th><th>选它的理由</th><th>送 DFT 前检查</th></tr></thead><tbody>
+          <tr><td>初始结构</td><td>1 帧</td><td>测得起始几何上的 ML/DFT 力差异</td><td>结构文件、原子顺序、约束正确</td></tr>
+          <tr><td>优化早期与中期</td><td>各 1–2 帧</td><td>覆盖大力区和界面主要调整阶段</td><td>去除相邻重复帧</td></tr>
+          <tr><td>后期及候选终点</td><td>2 帧左右</td><td>检验 ML 极小点附近的 DFT 残余力</td><td>确认优化没有假收敛或结构坍塌</td></tr>
+          <tr><td>异常事件帧</td><td>1–2 帧</td><td>覆盖配位改变、大位移或模型分歧</td><td>区分真实结构变化和明显非物理坏帧</td></tr>
+          <tr><td>小幅扰动帧</td><td>1 帧起</td><td>检验模型是否只记住一条优化路径</td><td>扰动温和，不制造重叠/断键</td></tr>
+        </tbody></table></div>
+        <div class="grid2" style="margin-top:15px">
+          <article class="panel"><h3>可用不确定度时</h3><p>若接口支持且验证过模型委员会，运行 3 个不同随机种子的微调模型，比较逐原子力差异；优先标注界面区分歧最大的构型。单模型预测差异不能冒充不确定度。</p></article>
+          <article class="panel"><h3>暂时没有不确定度接口时</h3><p>按配位变化、异常位移、局部键长变化、ML 能量/力突变等事件筛帧。这是结构事件驱动的 DFT 在环采样，清楚记录规则即可，不宣称是严格的委员会不确定度采样。</p></article>
+        </div>
+        <div class="callout"><b>扰动范围只是初始建议：</b>普通原子可尝试 0.03–0.08 Å 小扰动；界面间距可少量测试约 ±0.2–0.3 Å。生成后必须做几何筛查，明显坏结构不应为了“增加数据量”而当成训练目标。</div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="labels">
+      <div class="section-head"><div><p class="eyebrow">05 / DFT LABELS</p><h2>DFT 单点必须同时给出可信能量和力</h2></div><p class="intro">主动学习的新增数据不是任意计算输出，而是与目标方法一致、电子自洽收敛且原子映射可靠的能量—力标签。</p></div>
+      <div class="grid2">
+        <article class="panel"><h3>固定几何 DFT 标注</h3><ul><li>原子坐标和晶胞固定，不做离子步；</li><li>沿用目标 PBE+U、自旋、D3(BJ)、赝势/轨道与数值精度；</li><li>记录初始磁矩、最终磁态和电子占据相关设置；</li><li>保存总能量、288 原子逐原子力、SCF 轨迹与输入文件。</li></ul></article>
+        <article class="panel"><h3>标签进入数据集的门槛</h3><ul><li>SCF 达到阈值，无明显总能异常跳变；</li><li>坐标、力和元素顺序一一对应；</li><li>磁态/自旋分支明确，不能混淆不同电子解；</li><li>记录固定原子。固定与否是优化约束，不应删除其 DFT 力标签。</li></ul></article>
+      </div>
+      <div class="callout"><b>SCF 未收敛的帧不做训练标签。</b>保留它作为待诊断高风险结构；必要时使用干净电子初猜重新求解。不要把另一几何的电荷密度或 `onsite.dm` 当成一定适用的初猜。</div>
+    </section>
+
+    <section class="section alt" id="dataset">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">06 / DATASET BUILD</p><h2>检查数据结构和训练/验证划分</h2></div><p class="intro">ABACUS 输出转换后，先检查数据完整性，再启动训练。原子顺序一致是跨帧训练的硬条件。</p></div>
+        <div class="code">system = dpdata.LabeledSystem("path/to/abacus_scf", fmt="abacus/scf")
+system.to("deepmd/npy", "dataset_round00")
+
+# 转换后人工/脚本检查：
+# 288 atoms per frame; same atom order and type_map
+# finite energy/force; correct cell and units
+# SCF-converged labels only; fixed-atom mask kept in manifest</div>
+        <div class="grid2" style="margin-top:14px">
+          <article class="panel"><h3>数据核查项</h3><p>检查 `type.raw`、`type_map.raw`、坐标、晶胞、能量和力数组形状；帧数、288 原子计数、元素顺序一致；无 NaN/Inf；每帧 SCF 收敛状态可追踪。</p></article>
+          <article class="panel"><h3>防止验证集泄漏</h3><p>按结构或阶段留出验证帧，不能把同一轨迹的相邻帧随机拆到训练和验证两边。验证集用于模拟模型面对“未参与拟合的构型”。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="training">
+      <div class="section-head"><div><p class="eyebrow">07 / FINE-TUNING</p><h2>小数据阶段先验证 LoRA 微调</h2></div><p class="intro">DPA4 高参数 checkpoint 是否能按当前 DeepMD-kit 版本接受这份 checkpoint 微调，需以环境实测为准。下面配置仅是流程示意，不能未经版本核对直接当作生产输入。</p></div>
+      <div class="grid2">
+        <article class="panel"><h3>推荐的首轮策略</h3><p>若 checkpoint 与当前工具版本兼容，先用 LoRA 对界面数据微调，减少小数据对通用预训练权重的整体扰动。保留未微调模型作为基线。</p><p>同步比较训练集和结构留出验证集上的能量误差、全体系力误差，以及界面 TM/O/P/Li 分组力误差。</p></article>
+        <article class="panel"><h3>不要只看训练损失</h3><p>训练误差下降只说明模型更贴合已见样本。若验证误差增大、界面最大力误差偏大，或微调后结构出现新异常，表示当前数据覆盖不足或有过拟合风险。</p><p>当 LoRA 不能改善且已有多种可靠界面标签后，再评估全参数微调/重训。</p></article>
+      </div>
+      <div class="code"># 概念流程；需用安装版本的官方 schema 校验字段和命令
+dp --pt train lora_ft.json \
+  --finetune &lt;DPA4_MAX_PARAMS_CHECKPOINT&gt;</div>
+      <div class="callout"><b>本项目的训练目标：</b>近似目标 DFT 的能量和受力，以改善该结构附近的优化方向。ML 势不产生差分电荷、DOS/PDOS 或 DFT 自洽磁态。</div>
+    </section>
+
+    <section class="section dark" id="loop">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow" style="color:var(--lime)">08 / ACTIVE LEARNING CYCLE</p><h2>每一轮做什么，何时回到 DFT？</h2></div><p class="intro">每轮只新增少量去重后的高信息结构；然后重新优化，观察误差是否转移或改善。</p></div>
+        <div class="decision">
+          <article><h3>继续采样并更新</h3><p>DFT 与 ML 在界面原子力上差异较大；出现未见配位；微调验证集误差仍高；或候选结构在 DFT 下最大受力未达标。按失效环境补帧，完成下一轮标注和微调。</p></article>
+          <article><h3>进入最终结构验收</h3><p>轨迹局部结构稳定、验证误差不再明显变化，且新模型优化得到合理候选。此时停止训练判定仍不是结构通过；必须做干净的目标 DFT 单点求受力。</p></article>
+        </div>
+        <div class="callout"><b>每轮规模：</b>第一轮建议 8–12 个代表帧建立基线；后续每轮新增约 3–6 个高信息帧作为预算起点，而非固定配额。若 SCF 标签困难或结构重复，应缩减或调整样本。</div>
+      </div>
+    </section>
+
+    <section class="section alt" id="acceptance">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">09 / DFT ACCEPTANCE</p><h2>决定结构是否能进入电子性质计算</h2></div><p class="intro">验收在冻结 ML 几何上进行，使用与最终性质相同的目标 DFT 方法。固定原子的力单独报告；几何阈值应用于可动原子。</p></div>
+        <div class="gates">
+          <article class="gate"><small>GATE 01</small><h3>电子自洽</h3><p>SCF 收敛、达到目标阈值、无异常能量跳变；磁态和占据可复核。</p></article>
+          <article class="gate"><small>GATE 02</small><h3>DFT 残余受力</h3><p>240 个可动原子最大受力分量 ≤ 0.05 eV/Å。记录全部力向量，固定原子另列。</p></article>
+          <article class="gate"><small>GATE 03</small><h3>局部几何合理</h3><p>检查 PO₄、LRM 层状骨架、TM–O/Li–O 接触和异常短距离；避免只用单一最大力指标。</p></article>
+        </div>
+        <div class="grid2" style="margin-top:14px">
+          <article class="panel"><h3>未通过时</h3><p>若电子收敛但残余力过大：把收敛的 DFT 力作为新标签，定位误差原子和局部环境；再微调/优化，或从该候选开始短程 DFT 几何细化。</p></article>
+          <article class="panel"><h3>通过后</h3><p>冻结通过验收的几何，按一致晶胞、坐标映射和计算参数开展差分电荷、DOS/PDOS 与结合能计算。它仍代表该局部模型和约束，不等于宏观包覆层的全部行为。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="deliverables">
+      <div class="section-head"><div><p class="eyebrow">10 / REVIEWABLE OUTPUTS</p><h2>每轮结束时应留下的证据</h2></div><p class="intro">结果需要让合作者能够回答：用了哪个模型、哪些构型、哪些 DFT 标签，模型是否变好，结构为什么通过或未通过。</p></div>
+      <div class="table-scroll"><table><thead><tr><th>证据包</th><th>至少保存</th><th>对应判断</th></tr></thead><tbody>
+        <tr><td>模型身份</td><td>checkpoint 哈希、DeepMD/PyTorch 版本、配置、映射和输入输出测试</td><td>是否确实运行了同一个模型</td></tr>
+        <tr><td>优化轨迹</td><td>坐标、能量、力、约束、结构事件审计、终止原因</td><td>模型在哪些局部环境探索或失效</td></tr>
+        <tr><td>DFT 标签</td><td>输入、SCF 日志、能量、逐原子力、磁态、收敛审计</td><td>训练数据是否可信且可复现</td></tr>
+        <tr><td>模型更新</td><td>训练/验证清单、误差分组、训练曲线、模型哈希</td><td>微调是否泛化到未见构型</td></tr>
+        <tr><td>最终验收</td><td>DFT 固定几何单点、可动/固定受力分组、局部几何检查</td><td>几何能否进入电子性质计算</td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section class="section dark">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow" style="color:var(--lime)">FIRST PILOT</p><h2>建议的第一轮试点交付</h2></div><p class="intro">先回答工具兼容性和误差是否可改善，再决定是否扩展训练投入。</p></div>
+        <div class="decision">
+          <article><h3>试点的最小产物</h3><p>一条可复现的 DPA4 高参数 checkpoint 短程轨迹；8–12 个候选帧的筛选表；其中可收敛的 DFT 能量/力标签；一次 LoRA 前后对照；一份 DFT 终点受力验收报告。</p></article>
+          <article><h3>试点要回答的问题</h3><p>checkpoint 能否正确推理和微调？当前 288 原子界面上 ML 力与目标 DFT 力差多少？少量本体系标签是否改善验证误差和 DFT 终点受力？新增流程的成本是否低于直接 DFT 优化？</p></article>
+        </div>
+        <div class="callout"><b>决策边界：</b>如果 checkpoint 无法兼容、DFT 标签无法可靠收敛，或微调后 DFT 终点受力没有改善，就暂停该模型路线并诊断原因；不能用较低的 ML 力把不通过的结构判为合格。</div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="wrap footer-inner"><span>技术路线说明，不代表已完成 DPA4 高参数 checkpoint 推理、微调或新增 DFT 计算。</span><span><a href="mlip-execution-plan.html">打开详细执行方案 ↗</a>　·　<a href="../LRM_LPO_DPA4%E4%B8%BB%E5%8A%A8%E5%AD%A6%E4%B9%A0%E5%AE%8C%E6%95%B4%E5%AE%9E%E6%96%BD%E6%96%B9%E6%A1%88_20261029.md">打开完整实施文档 ↗</a>　·　<a href="mlip-active-learning.html">返回主动学习概念页 ↗</a></span></div></footer>
+</body>
+</html>

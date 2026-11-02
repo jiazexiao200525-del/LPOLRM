@@ -1,0 +1,1656 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="LRM×Li₃PO₄ 界面 MLIP→DFT 执行流程：冻结基线、阶段 0-7、判据与脚本">
+<title>LRM×Li₃PO₄ 界面 MLIP→DFT 执行流程 · v3.2 交互版</title>
+<style>
+  :root{
+    --bg:#f4f7f8; --surface:#ffffff; --sidebar:#ffffff; --topbar:rgba(255,255,255,.86);
+    --ink:#101d24; --muted:#5c6f77; --line:#dce5e8; --hover:#eef4f5; --th:#f2f6f7;
+    --accent:#0a7d76; --accent-soft:#e2f3f1; --accent-ink:#0a6b65; --accent-strong:#07635d;
+    --amber:#b46a05; --amber-soft:#fdf3e2; --amber-fg:#7a4a05;
+    --blue:#31699a; --blue-soft:#eaf2f9; --blue-fg:#254a6b;
+    --rust:#a83f24; --rust-soft:#fbede8; --rust-fg:#6b3220;
+    --code-bg:#0f252d; --code-fg:#d7e8ab; --code-comment:#78909b; --code-hl:#9fe8a8;
+    --tag-v-bg:#d8f0e3; --tag-v-fg:#1b6a44;
+    --shadow:0 4px 16px rgba(10,30,38,.07);
+    --shadow-lg:0 10px 30px rgba(10,30,38,.12);
+    --r:8px;
+  }
+  [data-theme="dark"]{
+    --bg:#0d1418; --surface:#141d22; --sidebar:#111a1f; --topbar:rgba(17,26,31,.88);
+    --ink:#e7eef1; --muted:#9bacb3; --line:#26343b; --hover:#1a252b; --th:#18232a;
+    --accent:#43b8ad; --accent-soft:#10312e; --accent-ink:#83dbd2; --accent-strong:#6fd2c8;
+    --amber:#e2a851; --amber-soft:#2b2317; --amber-fg:#f0c688;
+    --blue:#6dabdd; --blue-soft:#15242f; --blue-fg:#b7d6f0;
+    --rust:#e4927a; --rust-soft:#2d1d18; --rust-fg:#f0bda f;
+    --rust-fg:#f1c0b1;
+    --code-bg:#0a1317; --code-fg:#cfe3a8; --code-comment:#69838f; --code-hl:#a8eeb1;
+    --tag-v-bg:#123026; --tag-v-fg:#8fe0b4;
+    --shadow:0 4px 18px rgba(0,0,0,.45);
+    --shadow-lg:0 12px 34px rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:78px}
+  body{
+    background:var(--bg);color:var(--ink);
+    font:400 16px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    transition:background .25s,color .25s;
+  }
+  a{color:inherit;text-decoration:none}
+  code{
+    padding:2px 6px;border-radius:4px;
+    background:rgba(10,125,118,.09);color:var(--accent-ink);
+    font:13px/1.5 Consolas,"SF Mono",monospace;
+    word-break:break-word;
+  }
+  [data-theme="dark"] code{background:rgba(67,184,173,.14)}
+
+  /* ---------- 阅读进度 ---------- */
+  .progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:200;background:transparent;pointer-events:none}
+  .progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--blue));transition:width .1s linear}
+
+  /* ---------- 侧边索引 ---------- */
+  .sidebar{
+    position:fixed;top:0;left:0;bottom:0;width:302px;z-index:120;
+    display:flex;flex-direction:column;
+    background:var(--sidebar);border-right:1px solid var(--line);
+    transition:transform .26s cubic-bezier(.4,0,.2,1),background .25s;
+  }
+  .side-head{padding:20px 20px 14px;border-bottom:1px solid var(--line)}
+  .side-title{font-size:15px;font-weight:800;letter-spacing:.01em}
+  .side-title i{font-style:normal;color:var(--accent)}
+  .side-sub{margin-top:4px;font-size:11.5px;color:var(--muted);font-weight:600}
+  .side-search{padding:12px 14px 6px}
+  .side-search input{
+    width:100%;padding:9px 11px;border-radius:6px;
+    border:1px solid var(--line);background:var(--bg);color:var(--ink);
+    font:13px/1.4 inherit;outline:none;transition:border-color .16s,box-shadow .16s;
+  }
+  .side-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .toc{flex:1;overflow-y:auto;padding:6px 10px 14px;scrollbar-width:thin}
+  .toc::-webkit-scrollbar{width:8px}
+  .toc::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+  .toc-group{margin:4px 0}
+  .toc-group-btn{
+    width:100%;display:flex;align-items:center;gap:8px;
+    padding:8px 10px;border:0;background:none;cursor:pointer;
+    font:700 11.5px/1.4 inherit;color:var(--muted);
+    text-transform:none;letter-spacing:.06em;border-radius:5px;
+  }
+  .toc-group-btn:hover{background:var(--hover);color:var(--ink)}
+  .toc-group-btn .chev{margin-left:auto;font-size:10px;transition:transform .2s;opacity:.7}
+  .toc-group[data-open="0"] .chev{transform:rotate(-90deg)}
+  .toc-group[data-open="0"] .toc-items{display:none}
+  .toc-items{display:flex;flex-direction:column;gap:1px;padding:2px 0 6px}
+  .toc-items a{
+    display:flex;align-items:baseline;gap:8px;
+    padding:7px 10px 7px 12px;border-radius:5px;
+    font-size:13.5px;color:var(--muted);line-height:1.45;
+    border-left:2px solid transparent;transition:background .14s,color .14s,border-color .14s;
+  }
+  .toc-items a:hover{background:var(--hover);color:var(--ink)}
+  .toc-items a .n{
+    flex-shrink:0;font:700 11px/1.4 Consolas,monospace;color:var(--accent);
+    min-width:26px;opacity:.85;
+  }
+  .toc-items a.active{
+    background:var(--accent-soft);color:var(--accent-ink);
+    border-left-color:var(--accent);font-weight:700;
+  }
+  .toc-items a.active .n{opacity:1}
+  .side-foot{padding:12px 14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+  .ghost{
+    flex:1;min-width:84px;padding:8px 10px;border-radius:6px;
+    border:1px solid var(--line);background:var(--surface);color:var(--muted);
+    font:600 12px/1 inherit;cursor:pointer;transition:all .16s;
+  }
+  .ghost:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+  .backdrop{
+    position:fixed;inset:0;z-index:110;background:rgba(6,20,26,.45);
+    opacity:0;visibility:hidden;transition:opacity .24s,visibility .24s;
+  }
+
+  /* ---------- 主区域 ---------- */
+  .main{margin-left:302px;min-height:100vh}
+  .topbar{
+    position:sticky;top:0;z-index:100;
+    background:var(--topbar);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-in{
+    display:flex;align-items:center;gap:12px;
+    min-height:56px;padding:0 26px;max-width:1000px;
+  }
+  .crumb{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .crumb b{color:var(--ink);font-weight:800}
+  .topbar-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .icon-btn{
+    width:36px;height:36px;display:grid;place-items:center;
+    border:1px solid var(--line);border-radius:8px;background:var(--surface);
+    color:var(--muted);cursor:pointer;font-size:15px;transition:all .16s;
+  }
+  .icon-btn:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+  .only-mobile{display:none}
+
+  .wrap{width:min(1000px,calc(100% - 52px));margin:0 auto}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:56px 0 40px}
+  .badge{
+    display:inline-block;margin-bottom:14px;padding:5px 12px;border-radius:20px;
+    background:var(--accent-soft);color:var(--accent-ink);
+    font-size:11.5px;font-weight:800;letter-spacing:.05em;
+  }
+  .hero h1{
+    max-width:790px;margin:0 0 18px;
+    font-size:40px;line-height:1.2;font-weight:850;letter-spacing:-.015em;
+  }
+  .hero-lead{max-width:770px;color:var(--muted);font-size:17px;line-height:1.75}
+  .hero-lead strong{color:var(--ink);font-weight:750}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:12px;margin:28px 0 0}
+  .kpi{
+    padding:15px 17px;border:1px solid var(--line);border-radius:var(--r);
+    background:var(--surface);transition:transform .18s,box-shadow .18s,border-color .18s;
+  }
+  .kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--accent)}
+  .kpi b{display:block;font-size:11.5px;color:var(--muted);font-weight:700;letter-spacing:.02em;margin-bottom:6px}
+  .kpi span{font:800 20px/1.2 Consolas,monospace;color:var(--ink)}
+  .kpi em{display:block;font-style:normal;font-size:12.5px;color:var(--muted);margin-top:5px}
+
+  /* ---------- 区块 ---------- */
+  .section{padding:50px 0;border-top:1px solid var(--line)}
+  .section.alt{background:var(--th)}
+  .section-head{margin-bottom:24px}
+  .sec-num{
+    display:inline-block;margin-bottom:8px;
+    font:800 11.5px/1 Consolas,monospace;color:var(--accent);
+    letter-spacing:.14em;
+  }
+  .section-head h2{
+    margin:0 0 9px;font-size:27px;line-height:1.3;
+    font-weight:820;letter-spacing:-.012em;
+  }
+  .section-head p{max-width:790px;color:var(--muted);font-size:15.5px;line-height:1.72}
+
+  .phase{
+    margin:0 0 26px;padding:22px 24px;
+    border:1px solid var(--line);border-radius:var(--r);
+    background:var(--surface);box-shadow:var(--shadow);
+    transition:box-shadow .2s;
+  }
+  .phase:hover{box-shadow:var(--shadow-lg)}
+  .phase:last-child{margin-bottom:0}
+  .phase-head{
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);
+  }
+  .phase-badge{
+    padding:5px 11px;border-radius:5px;background:var(--accent);color:#fff;
+    font:800 11.5px/1.4 inherit;letter-spacing:.05em;white-space:nowrap;
+  }
+  [data-theme="dark"] .phase-badge{color:#07191c}
+  .phase-badge.check{background:var(--amber)}
+  .phase-badge.final{background:var(--blue)}
+  .phase-badge.stop{background:var(--rust)}
+  .phase-head h3{flex:1;font-size:20px;font-weight:780;letter-spacing:-.008em}
+  .phase-meta{color:var(--muted);font-size:12.5px;font-weight:650}
+
+  /* ---------- 步骤折叠 ---------- */
+  .steps{display:grid;gap:10px}
+  .step{
+    border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:var(--r);background:var(--surface);scroll-margin-top:80px;
+    transition:border-color .18s,box-shadow .18s;
+  }
+  .step:hover{border-left-color:var(--accent-strong)}
+  .step summary{
+    display:flex;align-items:center;gap:12px;padding:14px 16px;
+    cursor:pointer;list-style:none;user-select:none;
+  }
+  .step summary::-webkit-details-marker{display:none}
+  .step summary::after{
+    content:"展开";margin-left:auto;color:var(--accent);
+    font-size:11.5px;font-weight:800;letter-spacing:.02em;
+    padding:3px 8px;border-radius:4px;background:var(--accent-soft);
+  }
+  .step[open] summary::after{content:"收起"}
+  .step-num{
+    flex-shrink:0;min-width:36px;height:26px;padding:0 8px;
+    display:flex;align-items:center;justify-content:center;border-radius:5px;
+    background:var(--accent-soft);color:var(--accent-ink);
+    font:800 12px/1 Consolas,monospace;
+  }
+  .step summary strong{font-size:15.5px;font-weight:750}
+  .step-body{padding:4px 18px 18px;border-top:1px solid var(--line)}
+  .step-body h4{margin:18px 0 8px;font-size:13.5px;font-weight:800}
+  .step-body h4:first-child{margin-top:16px}
+  .step-body p,.step-body li{color:var(--muted);font-size:14.5px;line-height:1.78;margin:0 0 9px}
+  .step-body strong{color:var(--ink);font-weight:750}
+  .step-body ul,.step-body ol{padding-left:20px;margin:10px 0}
+  .step-body li{margin-bottom:6px}
+  mark{background:var(--amber-soft);color:var(--amber-fg);border-radius:3px;padding:0 3px}
+
+  /* ---------- 代码块 ---------- */
+  .code{
+    position:relative;margin:14px 0;padding:16px 16px 14px;
+    border-radius:7px;background:var(--code-bg);color:var(--code-fg);
+    font:13px/1.78 Consolas,"SF Mono",monospace;
+    overflow-x:auto;white-space:pre;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .code .comment{color:var(--code-comment)}
+  .code .hl{color:var(--code-hl)}
+  .copy{
+    position:absolute;top:8px;right:8px;
+    padding:4px 9px;border-radius:5px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.08);color:#cfe0e6;
+    font:700 11px/1 inherit;cursor:pointer;opacity:0;transition:opacity .16s,background .16s;
+  }
+  .code:hover .copy{opacity:1}
+  .copy:hover{background:rgba(255,255,255,.18)}
+  .copy.done{color:#9fe8a8;border-color:#9fe8a8}
+
+  /* ---------- 提示块 ---------- */
+  .note,.warn,.ok{
+    margin:14px 0;padding:13px 15px;border-radius:0 6px 6px 0;
+    font-size:14px;line-height:1.74;
+  }
+  .note{border-left:3px solid var(--blue);background:var(--blue-soft);color:var(--blue-fg)}
+  .note strong{color:var(--blue-fg)}
+  .warn{border-left:3px solid var(--rust);background:var(--rust-soft);color:var(--rust-fg)}
+  .warn strong{color:var(--rust-fg)}
+  .ok{border-left:3px solid var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+  .ok strong{color:var(--accent-ink)}
+
+  .outputs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+  .outputs span{
+    padding:4px 9px;border-radius:4px;background:var(--hover);color:var(--muted);
+    font:700 11.5px/1.4 Consolas,monospace;
+  }
+  .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:800;white-space:nowrap;vertical-align:1px}
+  .tag.v{background:var(--tag-v-bg);color:var(--tag-v-fg)}
+  .tag.p{background:var(--amber-soft);color:var(--amber-fg)}
+  .tag.r{background:var(--blue-soft);color:var(--blue-fg)}
+
+  /* ---------- 表格 ---------- */
+  .table-wrap{
+    margin:20px 0;border:1px solid var(--line);border-radius:var(--r);
+    overflow-x:auto;background:var(--surface);
+  }
+  .table-wrap table{width:100%;border-collapse:collapse;min-width:600px}
+  .table-wrap th,.table-wrap td{padding:11px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  .table-wrap th{background:var(--th);color:var(--ink);font-size:12.5px;font-weight:800;white-space:nowrap}
+  .table-wrap td{color:var(--muted);font-size:14px;line-height:1.68}
+  .table-wrap tr:last-child td{border-bottom:none}
+  .table-wrap tbody tr:hover td{background:var(--hover)}
+  .table-wrap td.k{color:var(--ink);font-weight:750;white-space:nowrap}
+  .table-wrap .num{font-family:Consolas,monospace;font-size:13px}
+  .table-wrap .pass{color:var(--accent);font-weight:750}
+  .table-wrap .mid{color:var(--amber);font-weight:750}
+  .table-wrap .fail{color:var(--rust);font-weight:750}
+
+  /* ---------- 流程树 ---------- */
+  .tree{
+    margin:22px 0;padding:22px;border:1px solid var(--line);
+    border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow);
+  }
+  .tree-row{
+    padding:14px 16px;margin:8px 0;border-left:3px solid var(--accent);
+    border-radius:0 6px 6px 0;background:var(--th);
+    transition:transform .16s,box-shadow .16s;
+  }
+  .tree-row:hover{transform:translateX(3px);box-shadow:var(--shadow)}
+  .tree-row.check{border-color:var(--amber)}
+  .tree-row.final{border-color:var(--blue)}
+  .tree-row strong{display:block;margin-bottom:4px;font-size:14.5px;font-weight:780}
+  .tree-row p{color:var(--muted);font-size:13.5px;line-height:1.65}
+  .tree-arrow{text-align:center;color:var(--line);font-size:16px;margin:2px 0}
+
+  /* ---------- 交互工具 ---------- */
+  .tool{
+    margin:24px 0;padding:22px 24px;border-radius:var(--r);
+    border:1px solid var(--accent);background:var(--surface);
+    box-shadow:0 0 0 4px var(--accent-soft),var(--shadow);
+    scroll-margin-top:80px;
+  }
+  .tool-head{margin-bottom:18px}
+  .tool-badge{
+    display:inline-block;margin-bottom:8px;padding:3px 9px;border-radius:20px;
+    background:var(--accent);color:#fff;font:800 10.5px/1.5 inherit;letter-spacing:.08em;
+  }
+  [data-theme="dark"] .tool-badge{color:#07191c}
+  .tool-head h3{font-size:19px;font-weight:800;margin-bottom:6px}
+  .tool-head p{color:var(--muted);font-size:14px}
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px}
+  .tool-grid label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:750;color:var(--muted)}
+  .tool-grid input[type=number]{
+    padding:10px 12px;border-radius:6px;border:1px solid var(--line);
+    background:var(--bg);color:var(--ink);font:700 15px/1.2 Consolas,monospace;outline:none;
+    transition:border-color .16s,box-shadow .16s;
+  }
+  .tool-grid input[type=number]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .tool-checks{display:flex;flex-wrap:wrap;gap:16px;margin:4px 0 16px}
+  .tool-checks label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer}
+  .tool-checks input{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
+  .verdict{
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:16px 18px;border-radius:8px;font-weight:800;font-size:15.5px;
+    background:var(--hover);border:1px solid var(--line);
+    transition:background .2s,border-color .2s,color .2s;
+  }
+  .verdict .big{font:800 30px/1 Consolas,monospace;letter-spacing:.02em}
+  .verdict.pass{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+  .verdict.fail{background:var(--rust-soft);border-color:var(--rust);color:var(--rust-fg)}
+  .verdict ul{margin:0;padding-left:18px;font-size:13.5px;font-weight:600;color:inherit;opacity:.92}
+  .verdict li{margin:2px 0}
+  .tool-note{margin-top:12px;font-size:12.5px;color:var(--muted)}
+  .readout{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:6px;
+  }
+  .readout div{
+    padding:13px 15px;border-radius:7px;background:var(--bg);border:1px solid var(--line);
+  }
+  .readout b{display:block;font-size:11.5px;font-weight:750;color:var(--muted);margin-bottom:5px}
+  .readout span{font:800 18px/1.2 Consolas,monospace;color:var(--ink)}
+
+  /* ---------- 确认清单 ---------- */
+  .checklist{margin:20px 0}
+  .checklist-progress{
+    display:flex;align-items:center;gap:12px;margin-bottom:14px;
+    padding:12px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--line);
+  }
+  .checklist-progress .bar{flex:1;height:7px;border-radius:6px;background:var(--hover);overflow:hidden}
+  .checklist-progress .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+  .checklist-progress span{font:800 13px/1 Consolas,monospace;color:var(--muted);white-space:nowrap}
+  .checklist label{
+    display:flex;gap:12px;align-items:flex-start;
+    padding:14px 16px;margin:8px 0;border:1px solid var(--line);border-radius:var(--r);
+    background:var(--surface);cursor:pointer;transition:all .16s;
+  }
+  .checklist label:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .checklist label.checked{border-color:var(--accent);background:var(--accent-soft)}
+  .checklist input{margin-top:4px;width:17px;height:17px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+  .checklist span{font-size:14.5px;color:var(--muted);line-height:1.72}
+  .checklist strong{color:var(--ink);font-weight:780}
+
+  /* ---------- 页脚 / 返回顶部 ---------- */
+  .footer{padding:26px 0;border-top:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:12.5px;line-height:1.95}
+  .footer a{color:var(--accent);font-weight:700}
+  .to-top{
+    position:fixed;right:24px;bottom:24px;z-index:110;
+    width:44px;height:44px;border-radius:50%;border:1px solid var(--line);
+    background:var(--surface);color:var(--accent);cursor:pointer;
+    font-size:18px;box-shadow:var(--shadow);opacity:0;visibility:hidden;
+    transition:all .22s;
+  }
+  .to-top.show{opacity:1;visibility:visible}
+  .to-top:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+
+  /* ---------- 响应式 ---------- */
+  @media(max-width:1024px){
+    .sidebar{transform:translateX(-100%);box-shadow:var(--shadow-lg)}
+    .sidebar.open{transform:translateX(0)}
+    .sidebar.open ~ .backdrop{opacity:1;visibility:visible}
+    .main{margin-left:0}
+    .only-mobile{display:grid}
+    .topbar-in{padding:0 16px}
+    .wrap{width:calc(100% - 32px)}
+  }
+  @media(max-width:760px){
+    .hero{padding:38px 0 30px}
+    .hero h1{font-size:30px}
+    .hero-lead{font-size:15.5px}
+    .section{padding:36px 0}
+    .phase{padding:18px 16px}
+    .tool{padding:18px 16px}
+    .kpis{grid-template-columns:1fr 1fr}
+    .to-top{right:14px;bottom:14px}
+  }
+
+  /* ---------- 打印 ---------- */
+  @media print{
+    .sidebar,.topbar,.progress,.to-top,.copy,.backdrop{display:none !important}
+    .main{margin:0}
+    .step{break-inside:avoid}
+    .step-body{display:block !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-bar" id="pbar"></div></div>
+
+<!-- ============ 侧边索引 ============ -->
+<aside class="sidebar" id="sidebar">
+  <div class="side-head">
+    <div class="side-title">LRM × Li₃PO₄ <i>/</i> 执行流程</div>
+    <div class="side-sub">MLIP → DFT · v3.2</div>
+  </div>
+
+  <div class="side-search">
+    <input id="sideSearch" type="search" placeholder="搜索章节（按 / 聚焦）" autocomplete="off">
+  </div>
+
+  <nav class="toc" id="toc">
+    <div class="toc-group" data-open="1">
+      <button class="toc-group-btn">概览 <span class="chev">▾</span></button>
+      <div class="toc-items">
+        <a href="#overview"><span class="n">00</span>目标与要点</a>
+        <a href="#baseline"><span class="n">01</span>冻结基线</a>
+        <a href="#flow"><span class="n">02</span>流程总览</a>
+      </div>
+    </div>
+
+    <div class="toc-group" data-open="1">
+      <button class="toc-group-btn">阶段 0 · 冻结与标定 <span class="chev">▾</span></button>
+      <div class="toc-items">
+        <a href="#p0"><span class="n">03</span>阶段 0 总览</a>
+        <a href="#s01"><span class="n">0.1</span>确认与授权</a>
+        <a href="#s02"><span class="n">0.2</span>冻结设置与收敛抽查</a>
+        <a href="#s03"><span class="n">0.3</span>力基势能面标定</a>
+        <a href="#s04"><span class="n">0.4</span>结构完整性闸门</a>
+      </div>
+    </div>
+
+    <div class="toc-group" data-open="1">
+      <button class="toc-group-btn">阶段 1-2 · 优化与筛查 <span class="chev">▾</span></button>
+      <div class="toc-items">
+        <a href="#p1"><span class="n">04</span>阶段 1 总览</a>
+        <a href="#s11"><span class="n">1.1</span>弛豫脚本</a>
+        <a href="#s12"><span class="n">1.2</span>轨迹审计与跨模型对照</a>
+        <a href="#s13"><span class="n">1.3</span>候选终点固化</a>
+        <a href="#p2"><span class="n">05</span>阶段 2 零成本筛查</a>
+      </div>
+    </div>
+
+    <div class="toc-group" data-open="1">
+      <button class="toc-group-btn">阶段 3 · DFT 验收 <span class="chev">▾</span></button>
+      <div class="toc-items">
+        <a href="#p3"><span class="n">06</span>阶段 3 总览</a>
+        <a href="#s31"><span class="n">3.1</span>输入搭建</a>
+        <a href="#s32"><span class="n">3.2</span>成本模型</a>
+        <a href="#s33"><span class="n">3.3</span>验收判据与提取</a>
+        <a href="#s34"><span class="n">3.4</span>同起点对照</a>
+        <a href="#calc"><span class="n">工具</span>验收判定器</a>
+      </div>
+    </div>
+
+    <div class="toc-group" data-open="1">
+      <button class="toc-group-btn">微调与收尾 <span class="chev">▾</span></button>
+      <div class="toc-items">
+        <a href="#b"><span class="n">07</span>判断 B 三向分支</a>
+        <a href="#p4"><span class="n">08</span>阶段 4 标签与微调</a>
+        <a href="#p56"><span class="n">09</span>阶段 5 / 6 复验</a>
+        <a href="#p7"><span class="n">10</span>阶段 7 性质计算</a>
+      </div>
+    </div>
+
+    <div class="toc-group" data-open="1">
+      <button class="toc-group-btn">成本、风险与附录 <span class="chev">▾</span></button>
+      <div class="toc-items">
+        <a href="#cost"><span class="n">11</span>成本与路径</a>
+        <a href="#cost-calc"><span class="n">工具</span>成本估算器</a>
+        <a href="#risk"><span class="n">12</span>风险与回退</a>
+        <a href="#check"><span class="n">13</span>执行前确认清单</a>
+        <a href="#appendix"><span class="n">14</span>附录</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="side-foot">
+    <button class="ghost" id="expandAll">全部展开</button>
+    <button class="ghost" id="collapseAll">全部收起</button>
+  </div>
+</aside>
+<div class="backdrop" id="backdrop"></div>
+
+<!-- ============ 主内容 ============ -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-in">
+      <button class="icon-btn only-mobile" id="menuBtn" aria-label="打开目录">☰</button>
+      <span class="crumb" id="crumb"><b>目标与要点</b></span>
+      <div class="topbar-actions">
+        <a href="project-hub.html" style="color:var(--accent-ink);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">项目总入口 ↗</a>
+        <button class="icon-btn" id="themeBtn" aria-label="切换深浅色">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== 00 概览 ===== -->
+    <section class="hero wrap" id="overview">
+      <span class="badge">执行方案 · v3.2</span>
+      <h1>富锂锰基 / Li₃PO₄ 界面<br>MLIP 预优化 → DFT 验收 → 按需微调</h1>
+      <p class="hero-lead">
+        用机器学习势把 288 原子界面结构推到近邻，再用<strong>少量 DFT 离子步</strong>做验收；
+        只有当模型精度不足时，才在<strong>自有的 PBE+U 标签</strong>上生成数据并微调。
+        全部判据只用<strong>力</strong>与<strong>相对能</strong>——ML 与 DFT 的总能之间存在任意常数偏移，绝对比较无法给出结论。
+      </p>
+
+      <div class="kpis">
+        <div class="kpi"><b>体系</b><span>288</span><em>Li94 Mn26 Co6 Ni6 O144 P12</em></div>
+        <div class="kpi"><b>ML 模型</b><span>DPA4-Max</span><em>OMat24 v20260911 · 主模型</em></div>
+        <div class="kpi"><b>DFT 级别</b><span>PBE+U+D3</span><em>lcao · 100 Ry · 1×3×2 · 1e-6</em></div>
+        <div class="kpi"><b>验收判据</b><span>0.05</span><em>可动原子 max|F|，加 RMS 0.03</em></div>
+      </div>
+
+      <div class="ok">
+        <strong>已完成的部分（不重复劳动）</strong>
+        ML 预优化已跑通：LBFGS、<code>maxstep 0.1 Å</code>、<code>FixAtoms(48)</code>，606 步 / 905 秒；
+        已产出完整轨迹与每 20 步一帧的阶梯数据，并用两个独立模型（Air / Neo）做过同起点对照。
+        本流程从"冻结设置 + 标定 + 零成本筛查"接着往下走。
+      </div>
+    </section>
+
+    <!-- ===== 01 冻结基线 ===== -->
+    <section class="section alt" id="baseline">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="sec-num">01 / BASELINE</span>
+          <h2>冻结基线</h2>
+          <p>
+            下表是当前生产运行正在使用的配置。所有 DFT 任务都从这份配置渲染，改动必须新建尝试记录并说明原因，不得就地覆盖。
+            <span class="tag v">已核实</span> 有文件证据 · <span class="tag p">待确认</span> 需老师确认 · <span class="tag r">流程要求</span> 规范要求。
+          </p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:20%">项目</th><th style="width:42%">取值</th><th style="width:38%">说明</th></tr></thead>
+            <tbody>
+              <tr><td class="k">结构</td><td class="num">288 原子：Li94 Mn26 Co6 Ni6 O144 P12（ntype 6）</td><td>双层面内超胞 71.81 × 19.00 × 32.89 Å。<span class="tag p">需确认当前版本</span></td></tr>
+              <tr><td class="k">赝势 / 轨道</td><td class="num">Li/Mn/Co/Ni/O：ONCV_PBE-1.0.upf；P：P.PD04.PBE.UPF；100 Ry 数值轨道组</td><td>upf201 标记，路径相对 <code>pseudo_dir</code> / <code>orbital_dir</code>。</td></tr>
+              <tr><td class="k">基组 / 求解器</td><td class="num">basis_type lcao，ks_solver genelpa，ecutwfc 100.0</td><td>本地运行期：<code>abacus-agent-runtime</code>。</td></tr>
+              <tr><td class="k">K 点</td><td class="num">Γ 型 1 × 3 × 2</td><td><span class="tag p">需补收敛抽查</span>（见 0.2）。</td></tr>
+              <tr><td class="k">电子结构</td><td class="num">PBE，nspin 2，symmetry 0，gaussian 展宽 0.002 Ry</td><td><code>out_mul 1</code> 已开，可回收 TM 局域磁矩。</td></tr>
+              <tr><td class="k">DFT+U</td><td class="num">dft_plus_u 1；orbital_corr −1 2 2 2 −1 −1；hubbard_u 0 3.9 3.3 6.2 0 0；onsite_radius 3.0 Bohr</td><td>顺序 = Li Mn Co Ni O P。<span class="tag p">U 值来源需书面确认</span>：它定义目标势能面。</td></tr>
+              <tr><td class="k">色散</td><td class="num">vdw_method d3_bj</td><td>已定，后续不需再决策。</td></tr>
+              <tr><td class="k">SCF</td><td class="num">scf_thr 1e-6，scf_thr_type 2，scf_nmax 600</td><td>broyden 0.2 / beta_mag 0.4 / ndim 20 / gg0 1.0 / mixing_restart 5e-4 / mixing_dmr 1。</td></tr>
+              <tr><td class="k">离子步</td><td class="num">calculation md，md_type fire，md_dt 0.5，md_tfirst 0，force_thr_ev 1e-8</td><td><code>force_thr_ev 1e-8</code> 用于禁止 FIRE 提前自停，保证轨迹可比。</td></tr>
+              <tr><td class="k">ML 模型</td><td class="num"><b>DPA4-Max-OMat24-v20260911.pt</b>（主，396 MB）<br>DPA4-Neo-OMat24-v20260805.pt（对照）</td><td>Max 是单任务 <code>Default</code>（无需指定 head），checkpoint 内置 <code>use_amp=True</code>（混合精度）。<b>其 type_map 为全元素表</b>，atype 必须用 type_map 0 基索引，不能用原子序数——详见下方模型体检。committee 需要第二个模型，故 Neo 保留为对照。</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note">
+          <strong>数据与产物索引</strong><br>
+          生产 INPUT / KPT / STRU：<code>calculations/fire_progress_probe_288_20261025/</code><br>
+          ML 轨迹与阶梯数据：<code>calculations/LRM_LPO_DPA4Air_preopt_20261028/download/</code>（<code>relaxed_dpa4air.traj</code>、<code>ladder.csv</code>、<code>snap_*.extxyz</code>）<br>
+          对照模型与层间距变体：<code>calculations/LRM_LPO_DPA4_preopt_288_fix2_20261027/</code>、<code>.../LRM_LPO_DPA4Air_preopt_gap15_20261029/</code><br>
+          背景与文献：<code>文献调研_MLIP加速LRM-LPO界面弛豫技术难点_20261029.md</code>、<code>结构审查报告.md</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 02 流程总览 ===== -->
+    <section class="section" id="flow">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="sec-num">02 / FLOW</span>
+          <h2>流程总览</h2>
+          <p>先冻结与标定，再做零成本筛查，最后才花 DFT。每个判断节点的通过条件都必须是可测的力、相对能或几何量。</p>
+        </div>
+
+        <div class="tree">
+          <div class="tree-row">
+            <strong>阶段 0 · 冻结与标定</strong>
+            <p>确认与授权 → 冻结 DFT 设置并抽查收敛 → 力基势能面标定 → 结构完整性闸门　<span class="pass">DFT：0-6 个单点（优先复用历史任务）</span></p>
+          </div>
+          <div class="tree-arrow">↓</div>
+          <div class="tree-row">
+            <strong>阶段 1 · ML 预优化</strong>
+            <p>LBFGS 弛豫 + 层间距阶梯 + 跨模型对照；全程审计位移、能量与模型偏差　<span class="pass">DFT：0</span></p>
+          </div>
+          <div class="tree-arrow">↓</div>
+          <div class="tree-row check">
+            <strong>阶段 2 · 零成本筛查（判断 A）</strong>
+            <p>偏差是否增长、跨模型是否一致、碎块能量是否合理、几何是否完整　<span class="pass">DFT：0</span></p>
+          </div>
+          <div class="tree-arrow">↓</div>
+          <div class="tree-row check">
+            <strong>阶段 3 · DFT 验收</strong>
+            <p>DFT 离子步 3-10 步 → 提取 max|F| / RMS / 磁矩 / 几何判据　<span class="pass">DFT：3-10 个离子步</span></p>
+          </div>
+          <div class="tree-arrow">↓</div>
+          <div class="tree-row">
+            <strong>判断 B · 三向分支</strong>
+            <p>B1 模型够准 → 回阶段 1 调策略　B2 界面偏差 → 定向微调　B3 大偏差或磁态异常 → 必须微调并补标签</p>
+          </div>
+          <div class="tree-arrow">↓</div>
+          <div class="tree-row final">
+            <strong>阶段 4 · 标签生成与 LoRA 微调</strong>
+            <p>标签只沿 DFT+U 路径生成，一个数据集只对应一个势能面　<span class="pass">2-4 周</span></p>
+          </div>
+          <div class="tree-arrow">↓</div>
+          <div class="tree-row final">
+            <strong>阶段 5 / 6 · 复验与稳定性</strong>
+            <p>新模型重跑阶段 1-3 全套判据；稳定性评估按需，不默认执行</p>
+          </div>
+          <div class="tree-arrow">↓</div>
+          <div class="tree-row">
+            <strong>阶段 7 · 性质计算</strong>
+            <p>界面 SCF / 差分电荷 / 平面平均电荷 / DOS-PDOS / 结合能　<span class="pass">仅验收通过后执行</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 03 阶段 0 ===== -->
+    <section class="section alt" id="p0">
+      <div class="wrap">
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge">阶段 0</span>
+            <h3>冻结与标定</h3>
+            <span class="phase-meta">1-3 天 · DFT 单点 0-6 个</span>
+          </div>
+          <div class="steps">
+
+            <details class="step" id="s01" open>
+              <summary><span class="step-num">0.1</span><strong>确认与授权</strong></summary>
+              <div class="step-body">
+                <p>以下四项缺任何一项，都不进入消耗计算资源的环节：</p>
+                <ul>
+                  <li><span class="tag r">流程要求</span> <strong>结构确认</strong>：以哪一份结构为初始模型（当前版本 / 固定层版本 / 层间距变体），确认后绑定文件哈希。派生的弛豫结构属于新结构，需重新展示确认。</li>
+                  <li><span class="tag r">流程要求</span> <strong>U 值依据</strong>：<code>hubbard_u 0 3.9 3.3 6.2 0 0</code> 与 <code>onsite_radius 3.0 Bohr</code> 的文献或老师给定来源。U 决定目标势能面，不得静默改动。</li>
+                  <li><span class="tag r">流程要求</span> <strong>付费授权</strong>：每一个提交单独授权；准备方案不等于授权提交。</li>
+                  <li><span class="tag p">待确认</span> <strong>历史标签集</strong>：可用的自有 DFT 标签（来源路径、所用 INPUT、SCF 收敛帧数），用于 0.3 标定。</li>
+                </ul>
+                <h4>模型体检</h4>
+                <div class="code"><span class="comment"># 记录可复现身份，而不是只记文件名</span>
+sha256sum DPA4-Max-OMat24-v20260911.pt &gt; model_hash_max.txt
+sha256sum DPA4-Neo-OMat24-v20260805.pt &gt; model_hash_neo.txt
+<span class="comment"># DPA4-Max 期望 sha256 = 539a883c3d61d8971fc238510b5d107eb091abb9dfc664317dcf41832f864c9b</span>
+
+<span class="comment"># 确认 head / type_map / rcut / 精度</span>
+dp show DPA4-Max-OMat24-v20260911.pt &gt; model_card_max.txt
+dp show DPA4-Neo-OMat24-v20260805.pt &gt; model_card_neo.txt
+
+<span class="comment"># ⚠ DPA4-Max 的 type_map 是「全元素表」[H, He, Li, Be, B, C, N, O, F, Ne, Na, …]</span>
+<span class="comment">#   atype 必须用 type_map 的 0 基索引（Li=2, O=7, P=14, Mn=24, Co=26, Ni=27）</span>
+<span class="comment">#   不能用原子序数 Z（Li 会被当成 Be），也不能沿用旧的 6 元素顺序 Li Mn Co Ni O P</span>
+<span class="comment">#   用 dpdata 读自有 DFT 标签时 atom_types 是 0..5，喂给 Max 前必须重映射，否则静默算错</span></div>
+                <div class="outputs"><span>model_hash_*.txt</span><span>model_card_*.txt</span><span>structure_hash.txt</span><span>授权记录</span></div>
+              </div>
+            </details>
+
+            <details class="step" id="s02" open>
+              <summary><span class="step-num">0.2</span><strong>冻结 DFT 设置并抽查收敛性</strong></summary>
+              <div class="step-body">
+                <p>
+                  阶段 3 的判据（<code>max|F| ≤ 0.05 eV/Å</code>）只在"DFT 本身已收敛"的前提下成立。
+                  否则无法区分偏差来自 ML 模型还是数值设置，而 B1/B2/B3 的分支完全依赖这个区分。
+                  因此收敛抽查必须前置，而不是等到诊断阶段。
+                </p>
+                <h4>动作</h4>
+                <ol>
+                  <li>从生产任务复制 INPUT / KPT 原文，逐行核对基线表，写入 <code>dft_settings_frozen.json</code>（含各文件 sha256）。</li>
+                  <li>此后全部 DFT 任务（单点、离子步、性质）从该 JSON 渲染，禁止手改。</li>
+                </ol>
+                <h4>抽查项（每项 1 个单点；历史任务已有可比数据则直接复用）</h4>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>抽查项</th><th>对比</th><th>通过条件</th></tr></thead>
+                    <tbody>
+                      <tr><td class="k">截断能</td><td class="num">100 → 120 Ry</td><td class="pass">max|F| 变化 ≪ 0.01 eV/Å</td></tr>
+                      <tr><td class="k">K 点</td><td class="num">1×3×2 → 2×4×2</td><td class="pass">max|F| 变化 ≪ 0.01 eV/Å</td></tr>
+                      <tr><td class="k">SCF 阈值</td><td class="num">1e-6 → 1e-7</td><td class="pass">max|F| 与总能变化均可忽略</td></tr>
+                      <tr><td class="k">真空与极性</td><td>层间真空是否足够；极性面是否需要 <code>dipole_correction</code></td><td class="pass">无周期像相互作用，能量与力均可复现</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="note">
+                  <strong>这是省钱而不是费钱的一步。</strong>若 K 点不足本身带来 0.1 eV/Å 的力偏差，后续整套标定与微调都会建立在错误判据上。
+                </div>
+                <div class="outputs"><span>dft_settings_frozen.json</span><span>conv_ecut.json</span><span>conv_kpt.json</span><span>conv_scf.json</span></div>
+              </div>
+            </details>
+
+            <details class="step" id="s03" open>
+              <summary><span class="step-num">0.3</span><strong>力基势能面标定</strong></summary>
+              <div class="step-body">
+                <p>
+                  要回答的问题是：<strong>在 PBE+U+D3(BJ) 这个势能面上，模型的力误差有多大、偏差集中在哪里。</strong>
+                  方法只用两种无偏移量：力（可直接比较），以及能量差（作差后偏移消失）。
+                </p>
+                <h4>方法</h4>
+                <ol>
+                  <li><strong>力</strong>：同一批帧比较 ML 力与 DFT 力的 MAE / RMSE，并按元素与区域（界面 / LRM 体相 / LPO 体相）分组。</li>
+                  <li><strong>相对能曲线</strong>：用层间距变体（<code>gap3.5/4.0/4.5/5.0 Å</code> 或 gap15 阶梯），以最低能帧为参考，比较 ΔE<sub>ML</sub>(d) 与 ΔE<sub>DFT</sub>(d) 的斜率与曲率。</li>
+                  <li><strong>色散的角色</strong>：D3(BJ) 已在基线内。要验证的是模型是否重现了 D3 带来的层间距能量曲率，由步骤 2 直接给出。</li>
+                </ol>
+                <div class="code"><span class="comment"># calib_pes.py —— 只使用力与相对能，不使用绝对总能</span>
+import numpy as np, dpdata
+from deepmd.infer import DeepPot
+
+MODELS = {"max": "DPA4-Max-OMat24-v20260911.pt",
+          "neo": "DPA4-Neo-OMat24-v20260805.pt"}
+<span class="comment"># ⚠ dpdata 的 atom_types 是「该数据集自己的 type_map」索引；DPA4-Max 用全元素表。</span>
+<span class="comment">#   直接 pot.eval(coords, cell, dft["atom_types"]) 会把 Li 当成 Be → 静默算错。</span>
+<span class="comment">#   必须先重映射：tm = pot.type_map; atype = [tm.index(ELE6[t]) for t in dft["atom_types"]]</span>
+
+dft    = dpdata.LabeledSystem("labels_dft", fmt="deepmd/npy")
+coords = dft["coords"]; cells = dft["cells"]; types = dft["atom_types"]
+F_dft  = dft["forces"]                       <span class="comment"># (nframes, natoms, 3)</span>
+E_dft  = dft["energies"]                     <span class="comment"># 仅用于相对能</span>
+region = np.load("region_mask.npy")          <span class="comment"># 0 界面 / 1 LRM / 2 LPO</span>
+natoms = dft.get_natoms()
+
+report = {}
+for name, path in MODELS.items():
+    pot = DeepPot(path)
+    F_ml, E_ml = [], []
+    for i in range(len(coords)):
+        e, f, _ = pot.eval(coords[i], cells[i].reshape(3, 3), types, atomic=False)
+        E_ml.append(float(e[0])); F_ml.append(f[0])
+    F_ml = np.array(F_ml); E_ml = np.array(E_ml)
+    dF = F_ml - F_dft
+
+    entry = {"f_mae_all": float(np.abs(dF).mean()),
+             "f_rmse_all": float(np.sqrt((dF ** 2).mean()))}
+    for r, tag in [(0, "interface"), (1, "lrm"), (2, "lpo")]:
+        m = (region == r)
+        entry[f"f_mae_{tag}"] = float(np.abs(dF[:, m]).mean())
+
+    <span class="comment"># 相对能：各自以最低能帧为参考，偏移自动消掉</span>
+    dE_ml, dE_dft = E_ml - E_ml.min(), E_dft - E_dft.min()
+    entry["dE_slope"] = float(np.polyfit(dE_dft, dE_ml, 1)[0])          <span class="comment"># 目标 ≈ 1</span>
+    entry["dE_rmsd_meV_per_atom"] = float(
+        np.sqrt(((dE_ml - dE_dft) ** 2).mean()) / natoms * 1000)
+    report[name] = entry
+
+print(report)    <span class="comment"># 写入 calib_report.json，作为判断 B 的输入</span></div>
+                <h4>判据（本步骤只产出数字，不做设置决策）</h4>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>量</th><th>含义</th><th>参考门槛</th></tr></thead>
+                    <tbody>
+                      <tr><td class="k num">f_mae_all</td><td>整体力 MAE</td><td class="pass">≤ 0.03 eV/Å → 可直接进阶段 1</td></tr>
+                      <tr><td class="k num">f_mae_interface</td><td>界面区力 MAE</td><td class="mid">显著高于体相 → 微调应聚焦界面帧</td></tr>
+                      <tr><td class="k num">f_mae_TM</td><td>Mn / Co / Ni 上的力 MAE</td><td class="fail">偏大 → 指向 PBE 与 PBE+U 势能面混合问题</td></tr>
+                      <tr><td class="k num">dE_slope</td><td>相对能斜率</td><td class="pass">≈ 1 且 dE_rmsd 小 → 能量面一致</td></tr>
+                      <tr><td class="k num">dE_rmsd</td><td>相对能 RMSD</td><td class="mid">曲率不符 → 长程/色散处理不一致</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="warn">
+                  <strong>成本提示</strong>：若没有同一 INPUT 下的多帧 DFT 标签，本步骤需要 3-5 个单点。优先复用历史任务；能复用就不新算。
+                </div>
+                <div class="outputs"><span>calib_report.json</span><span>region_mask.npy</span><span>labels_dft/</span></div>
+              </div>
+            </details>
+
+            <details class="step" id="s04">
+              <summary><span class="step-num">0.4</span><strong>结构完整性闸门</strong></summary>
+              <div class="step-body">
+                <p>
+                  <code>结构审查报告.md</code> 已记录一个需要正视的事实：LPO 侧来自 packmol + 高温退火的<strong>非晶 slab</strong>，
+                  12 个 P 中有 7 个配位数仅为 3，只有 5 个保持完整 PO₄，界面附近存在被截断的四面体。
+                  这决定了初始力有多大，也决定了 ML 弛豫会不会给出"看起来合理但物理上无意义"的重构。
+                </p>
+                <h4>检查项（零 DFT 成本，全部脚本化）</h4>
+                <ul>
+                  <li>P 配位数分布：4 配位 / 3 配位 / 其他各多少个，是否集中在界面；</li>
+                  <li>最短接触：是否存在 &lt; 0.8 ×（共价半径和）的原子对；</li>
+                  <li>层间距：界面最小间距是否 &gt; 2.0 Å；</li>
+                  <li>化学计量与价态簿记：Li / Mn / Co / Ni 名义价态之和是否与体系电荷一致。</li>
+                </ul>
+                <div class="note">
+                  <strong>这一步的产出是一个待决策问题，不是一个自动通过的检查。</strong>
+                  需要老师在两个选项间定夺：接受现状、依赖弛豫修复；或先修结构（补氧 / 退火 / 换用晶体 Li₃PO₄）再投入 ML + DFT。
+                  建议把两个选项连同代价一起提交，不在文档里默认其一。
+                </div>
+                <div class="outputs"><span>structure_gate.json</span><span>P 配位分布</span><span>决策记录</span></div>
+              </div>
+            </details>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 04 阶段 1 ===== -->
+    <section class="section" id="p1">
+      <div class="wrap">
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge">阶段 1</span>
+            <h3>ML 预优化</h3>
+            <span class="phase-meta">已完成一轮：606 步 / 905 s · DFT 0 个</span>
+          </div>
+          <div class="steps">
+
+            <details class="step" id="s11" open>
+              <summary><span class="step-num">1.1</span><strong>弛豫脚本</strong></summary>
+              <div class="step-body">
+                <p>结构读写必须经 <code>abacustest</code> 或 <code>dpdata</code>：ASE 没有 ABACUS STRU 的读写器，STRU 也不是 QE 输入格式。</p>
+                <div class="code"><span class="comment"># relax_dpa4.py</span>
+import numpy as np
+from ase.optimize import LBFGS
+from ase.constraints import FixAtoms
+
+from abacustest.lib_prepare.stru import AbacusSTRU
+from deepmd.calculator import DP                 <span class="comment"># DeePMD-kit 3.x；旧版本为 deepmd.ase.DP</span>
+
+stru  = AbacusSTRU.read("structure_original.stru", fmt="stru")
+atoms = stru.to("ase")
+
+<span class="comment"># 固定原子索引来自结构文件本身，不用"240-287"这类口头约定</span>
+fixed = np.loadtxt("fixed_atoms.txt", dtype=int)
+atoms.set_constraint(FixAtoms(indices=fixed.tolist()))
+
+atoms.calc = DP(model="DPA4-Max-OMat24-v20260911.pt")   <span class="comment"># 单任务 Default，无需指定 head</span>
+
+opt = LBFGS(atoms, trajectory="relaxed.traj", logfile="opt.log")
+opt.attach(lambda: print(f"{opt.nsteps:4d}  E={atoms.get_potential_energy():.6f}"), interval=10)
+opt.run(fmax=0.02, steps=1000)
+
+out = AbacusSTRU.from_ase(atoms)
+out.write("optimized_final.stru", fmt="stru", direct=True)
+atoms.write("relaxed.extxyz")                    <span class="comment"># 便于后续对照与标定复用</span></div>
+                <h4>参数约定</h4>
+                <ul>
+                  <li><code>maxstep 0.1 Å</code>：当前实测可用的步长。</li>
+                  <li><code>fmax 0.02</code> 是 <strong>ML 力</strong>收敛限，与 DFT 验收判据（0.05 eV/Å）是两回事，不得混用。</li>
+                  <li>固定原子清单必须与 STRU 内 <code>m 0 0 0</code> 标记一致，不一致会静默改变体系。</li>
+                </ul>
+                <div class="outputs"><span>relaxed.traj</span><span>optimized_final.stru</span><span>relaxed.extxyz</span></div>
+              </div>
+            </details>
+
+            <details class="step" id="s12" open>
+              <summary><span class="step-num">1.2</span><strong>轨迹审计与跨模型对照</strong></summary>
+              <div class="step-body">
+                <h4>审计项（每 10-20 帧检查一次）</h4>
+                <ul>
+                  <li>能量趋势：单调下降或平台收敛，出现突增即停；</li>
+                  <li>单步最大位移：&gt; 0.1 Å/步即停；</li>
+                  <li>PO₄ 完整性：P–O 键 1.5-1.7 Å；界面最小间距 &gt; 2.0 Å；</li>
+                  <li><strong>模型偏差</strong>：沿轨迹用双模型 committee 计算，若单调增长说明已进入模型不可信区，立即停止。</li>
+                </ul>
+                <div class="code"><span class="comment"># 跨模型偏差：既用于轨迹审计，也用于终点可信度判定</span>
+<span class="comment"># 参数名以本机 `dp model-devi -h` 为准</span>
+dp model-devi -m DPA4-Max-OMat24-v20260911.pt \
+                 DPA4-Neo-OMat24-v20260805.pt \
+              -s traj_sys -n 200 -o devi.out</div>
+                <h4>起点策略</h4>
+                <ul>
+                  <li><strong>层间距阶梯</strong>：间距 0.2-0.4 Å 步长扫描（已有 gap15 变体）；</li>
+                  <li><strong>跨模型对照</strong>：同一起点分别用 Max / Neo 独立弛豫。</li>
+                </ul>
+                <p>随机微扰（±0.05 Å）基本仍在同一势阱内，信息量低，不作为起点策略。</p>
+                <div class="warn">
+                  <strong>已有实测结果（作为基线）</strong>：Air 终点相对起点平均位移 <strong>0.702 Å</strong>、<strong>127 个原子 &gt; 0.5 Å</strong>（占 288 原子的 44%）；
+                  Neo <strong>0.535 Å / 106 个原子</strong>。两个独立模型差到这个程度，本身就是阶段 2 判断 A 的核心输入。
+                  口径：全部 288 原子、相对同一起点，见 <code>MLIP零成本预检报告_20261102.html</code>。
+                </div>
+              </div>
+            </details>
+
+            <details class="step" id="s13">
+              <summary><span class="step-num">1.3</span><strong>候选终点固化</strong></summary>
+              <div class="step-body">
+                <ul>
+                  <li>committee <strong>偏差最小</strong>的 1-2 帧（单模型的能量排序在跨势能面场景下不可靠）；</li>
+                  <li>不同层间距 / 起点的终点各 1 帧；</li>
+                  <li>几何最完整（PO₄ 全四配位、无短接触）的 1 帧，即使能量略高。</li>
+                </ul>
+                <p>固化到 <code>candidates/candidate_XX.{stru,extxyz}</code>，记录来源轨迹帧号与文件哈希。</p>
+                <div class="outputs"><span>candidate_XX.stru</span><span>candidates/index.json</span></div>
+              </div>
+            </details>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 05 阶段 2 ===== -->
+    <section class="section alt" id="p2">
+      <div class="wrap">
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge check">阶段 2</span>
+            <h3>零成本筛查（判断 A）</h3>
+            <span class="phase-meta">小时级 · DFT 0 个</span>
+          </div>
+          <div class="step-body" style="border-top:none;padding-top:6px">
+            <p>把"要不要花 DFT"变成一个可测门槛。全部判据都不需要 DFT。</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th style="width:8%">#</th><th style="width:32%">测试</th><th style="width:32%">通过条件</th><th style="width:28%">不通过意味着</th></tr></thead>
+                <tbody>
+                  <tr><td class="k">A1</td><td>committee 偏差沿轨迹不增长</td><td class="pass">终点帧偏差低于训练集量级（阈值由 0.3 标定给出）</td><td>终点落在模型外推区，DFT 花在这里没有意义</td></tr>
+                  <tr><td class="k">A2</td><td>跨模型终点一致性</td><td class="pass">主模型与对照模型终点平均差 &lt; 0.3 Å</td><td>已有实测（Air ↔ Neo）= <b>0.584 Å</b>、130 个原子 &gt; 0.5 Å；同模型仅换收敛限（Neo ↔ Neo-f001）= 0.130 Å，两者相差 4.5 倍 → 终点由模型决定，须先解决模型问题。Max 跑完后按同一口径重算。</td></tr>
+                  <tr><td class="k">A3</td><td>碎块能量测试</td><td class="pass">E<sub>弛豫后</sub> &lt; E<sub>分离碎片</sub></td><td>弛豫后能量高于分离碎片，物理上不可能，该轨迹作废</td></tr>
+                  <tr><td class="k">A4</td><td>几何完整性</td><td class="pass">PO₄ 完整、无短接触、层间距 &gt; 2.0 Å</td><td>ML 造出了非物理结构</td></tr>
+                  <tr><td class="k">A5</td><td>TM 局域磁矩</td><td class="fail">模型不含自旋自由度，本阶段无法判定</td><td>必须留给阶段 3 的 DFT <code>out_mul</code> 检查</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="note">
+              <strong>分支</strong>：A1-A4 全过 → 进阶段 3。A2 或 A3 不过 → 直接进阶段 4 的标签与微调（阶段 3 仅在需要取证或取标签时才跑）。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 06 阶段 3 ===== -->
+    <section class="section" id="p3">
+      <div class="wrap">
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge check">阶段 3</span>
+            <h3>DFT 验收</h3>
+            <span class="phase-meta">3-10 天 · DFT 离子步 3-10 步</span>
+          </div>
+          <div class="steps">
+
+            <details class="step" id="s31" open>
+              <summary><span class="step-num">3.1</span><strong>输入搭建</strong></summary>
+              <div class="step-body">
+                <p>从冻结 JSON 渲染，只替换结构；其余保持与历史任务一致，以便与"50 步后仍 0.401 eV/Å"的记录可比。</p>
+                <div class="code"><span class="comment"># 生产 INPUT 关键行</span>
+calculation   md
+md_type       fire
+md_dt         0.5
+md_tfirst     0
+force_thr_ev  1e-8        <span class="comment"># 禁止因力达标提前自停，保证轨迹完整可比</span>
+basis_type    lcao
+ks_solver     genelpa
+ecutwfc       100.0
+nspin         2
+symmetry      0
+smearing_method gaussian
+smearing_sigma  0.002
+mixing_type   broyden
+mixing_beta   0.2
+mixing_beta_mag 0.4
+mixing_ndim   20
+mixing_gg0    1.0
+mixing_restart 5e-4
+mixing_dmr    1
+scf_nmax      600
+scf_thr       1e-6
+scf_thr_type  2
+dft_plus_u    1
+orbital_corr  -1 2 2 2 -1 -1
+hubbard_u     0 3.9 3.3 6.2 0 0
+onsite_radius 3.0
+vdw_method    d3_bj
+cal_force     1
+cal_stress    0
+out_mul       1
+out_stru      1
+gamma_only    0
+ntype         6</div>
+              </div>
+            </details>
+
+            <details class="step" id="s32" open>
+              <summary><span class="step-num">3.2</span><strong>成本模型</strong></summary>
+              <div class="step-body">
+                <p>实测事实：单步 SCF 迭代数呈<strong>双峰</strong>——收敛步约 40 次，落入慢/振荡区 180+ 次，<code>scf_nmax 600</code>。</p>
+                <div class="code"><span class="comment"># 每个量都用本项目实测值代入</span>
+cost(离子步 i)      = iter_i × c_iter
+cost(一次 DFT 验收) = Σ_i cost(i) + c_init
+
+iter_i ∈ {~40, ~180+}    <span class="comment"># 双峰；任务执行时记录真实分布</span>
+c_iter  = 单次 SCF 迭代墙钟（由已完成任务反算）
+c_init  = 首次 SCF / 随机初始化开销
+
+<span class="comment"># 历史锚点：50 个离子步后 max|F| = 0.401 eV/Å，距 0.05 仍很远</span></div>
+                <div class="warn">
+                  <strong>结论</strong>：在 288 原子 / lcao / 100 Ry / <code>scf_thr 1e-6</code> 的配置下，把纯 DFT 弛豫跑到 0.05 eV/Å 的期望离子步数在 10² 量级，每步又要 40-180+ 次 SCF 迭代。
+                  这既是"必须先用 ML 推到近邻"的依据，也意味着任何按"单点数"做的预算都会低估 1-2 个数量级。
+                </div>
+                <div class="outputs"><span>cost_ledger.json</span><span>每步迭代数分布</span></div>
+              </div>
+            </details>
+
+            <details class="step" id="s33" open>
+              <summary><span class="step-num">3.3</span><strong>验收判据与提取</strong></summary>
+              <div class="step-body">
+                <h4>判据（必须全部满足）</h4>
+                <ul>
+                  <li>SCF 收敛达标（<code>scf_thr 1e-6</code>，<code>scf_thr_type 2</code>），能量与磁矩历史无跳变；</li>
+                  <li><strong>可动原子 <code>max|F| ≤ 0.05 eV/Å</code></strong>（力的<mark>模</mark>；固定原子不参与）；</li>
+                  <li>可动原子 <code>RMS(F) ≤ 0.03 eV/Å</code>，防止"单点尖峰达标、整体仍不收敛"；</li>
+                  <li>无异常短接触（&gt; 0.8 × 共价半径和）；PO₄ 完整（P–O &lt; 1.7 Å）；</li>
+                  <li>TM 局域磁矩相对起点未退磁、未跳变（任一 TM 变化 &gt; 0.5 μB 视为磁态改变）。</li>
+                </ul>
+                <div class="code"><span class="comment"># check_accept.py</span>
+import numpy as np, dpdata
+
+ds = dpdata.LabeledSystem("OUT.ABACUS", fmt="abacus/md")   <span class="comment"># 或 abacus/relax</span>
+F  = ds["forces"][-1]                                      <span class="comment"># 最后一帧 (natoms, 3)</span>
+natoms = ds.get_natoms()
+fixed  = np.loadtxt("fixed_atoms.txt", dtype=int)
+mov    = np.setdiff1d(np.arange(natoms), fixed)
+
+fmag = np.linalg.norm(F[mov], axis=1)
+fmax = float(fmag.max())
+frms = float(np.sqrt((F[mov] ** 2).sum(axis=1).mean()))
+verdict = "PASS" if (fmax &lt;= 0.05 and frms &lt;= 0.03) else "FAIL"
+print(f"max|F|={fmax:.4f}  RMS={frms:.4f}  movable={mov.size}  {verdict}")</div>
+                <div class="note">
+                  <strong>若只做 1 个离子步</strong>：判据照上式算，同时记录残力下降斜率，作为"DFT 侧是否也朝同一极小值走"的证据。单步不下降，说明该 ML 终点在 DFT 面上不是下降方向。
+                </div>
+              </div>
+            </details>
+
+            <details class="step" id="s34">
+              <summary><span class="step-num">3.4</span><strong>同起点对照（最锋利的单个判据）</strong></summary>
+              <div class="step-body">
+                <p>
+                  从<strong>同一个初始磁态</strong>出发做 DFT+U 弛豫：若 DFT+U 只移动 &lt; 0.3 Å，而 MLIP 移动了 ~2.85 Å，则该次 ML 弛豫是假象。
+                  反之若两者位移量级一致，说明模型至少在方向与步长上可信。已有的 Air（0.702 Å 均值 / 127 个原子）与 Neo（0.535 / 106）位移统计可直接作为对照分母。
+                </p>
+              </div>
+            </details>
+
+          </div>
+        </div>
+
+        <!-- ===== 工具：验收判定器 ===== -->
+        <div class="tool" id="calc">
+          <div class="tool-head">
+            <span class="tool-badge">交互工具</span>
+            <h3>验收判定器</h3>
+            <p>把本次 DFT 验收提取到的数值填进来，即时给出判定与不通过的原因。</p>
+          </div>
+          <div class="tool-grid">
+            <label>可动原子 max|F|（eV/Å）
+              <input type="number" id="inMaxF" value="0.050" step="0.001" min="0">
+            </label>
+            <label>可动原子 RMS(F)（eV/Å）
+              <input type="number" id="inRms" value="0.030" step="0.001" min="0">
+            </label>
+            <label>TM 磁矩最大变化（μB）
+              <input type="number" id="inMag" value="0.00" step="0.01" min="0">
+            </label>
+          </div>
+          <div class="tool-checks">
+            <label><input type="checkbox" id="ckPO4" checked> PO₄ 完整（P–O &lt; 1.7 Å）</label>
+            <label><input type="checkbox" id="ckShort" checked> 无异常短接触（&gt; 0.8 × 共价半径和）</label>
+            <label><input type="checkbox" id="ckScf" checked> SCF 收敛达标（1e-6）且能量/磁矩无跳变</label>
+          </div>
+          <div class="verdict" id="verdict"></div>
+          <p class="tool-note">阈值：max|F| ≤ 0.05 eV/Å · RMS ≤ 0.03 eV/Å · 磁矩变化 ≤ 0.5 μB · 三个几何/收敛项均需勾选。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 07 判断 B ===== -->
+    <section class="section alt" id="b">
+      <div class="wrap">
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge stop">判断 B</span>
+            <h3>三向分支</h3>
+            <span class="phase-meta">输入：0.3 标定结果 + 3.3 验收结果</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:20%">条件</th><th style="width:38%">诊断</th><th style="width:42%">动作</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="k">B1<br>MAE ≤ 0.03 eV/Å<br>相对能斜率 ≈ 1<br>但验收不过</td>
+                  <td>模型在该势能面上够准，问题在数值设置或优化策略（K 点 / 截断能 / SCF、优化器步长、固定层应变）</td>
+                  <td>回到 0.2 的抽查结论与阶段 1 调整策略重跑；不微调</td>
+                </tr>
+                <tr>
+                  <td class="k">B2<br>0.03 &lt; MAE ≤ 0.10<br>偏差集中在界面</td>
+                  <td>体相可用、界面泛化不足</td>
+                  <td>定向微调：标签优先取界面帧（界面两侧各约 5 Å），体相帧少取</td>
+                </tr>
+                <tr>
+                  <td class="k">B3<br>MAE &gt; 0.10<br>或 TM 上大偏差<br>或磁态/几何异常</td>
+                  <td>命中 PBE 与 PBE+U 势能面混合问题（OMat24 系模型受影响最大）</td>
+                  <td>必须微调并补标签；标签只沿 DFT+U 路径生成；若需显式自旋，先补 <code>spin</code> / <code>force_mag</code> 标签</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 08 阶段 4 ===== -->
+    <section class="section" id="p4">
+      <div class="wrap">
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge final">阶段 4</span>
+            <h3>标签生成与 LoRA 微调</h3>
+            <span class="phase-meta">2-4 周 · 标签 10² 量级</span>
+          </div>
+          <div class="steps">
+
+            <details class="step" open>
+              <summary><span class="step-num">4.1</span><strong>标签生成的三条铁律</strong></summary>
+              <div class="step-body">
+                <ol>
+                  <li><strong>只沿 DFT+U 路径生成</strong>：帧来自 DFT 自己的离子步轨迹，不来自 MLIP 的假象路径，否则等于把错误势能面固化进模型。</li>
+                  <li><strong>一个数据集只对应一个势能面</strong>：不混入无 U、不同 U 或不同泛函的帧。</li>
+                  <li><strong>覆盖实际使用条件</strong>：目标是让模型在它将被使用的构型上准确，而不是在模型开发者预设的构型上准确。</li>
+                </ol>
+                <div class="code"><span class="comment"># 从 ABACUS 任务目录批量转 DeePMD 数据集</span>
+import dpdata
+for tag, path in [("md", "OUT.kfpro"), ("relax", "OUT.relax")]:
+    ds = dpdata.LabeledSystem(path, fmt="abacus/md")   <span class="comment"># scf→abacus/scf, relax→abacus/relax</span>
+    ds.to("deepmd/npy", f"dataset/{tag}")
+
+<span class="comment"># 划分按"结构 / 轨迹"分，不按帧随机分：相邻帧高度相关，随机分会造成验证集泄漏</span></div>
+                <div class="outputs"><span>dataset/train</span><span>dataset/valid</span><span>label_manifest.json</span></div>
+              </div>
+            </details>
+
+            <details class="step">
+              <summary><span class="step-num">4.2</span><strong>LoRA 微调与遗忘控制</strong></summary>
+              <div class="step-body">
+                <ul>
+                  <li>DPA-4 LoRA 目前限 <strong>PyTorch 单任务微调</strong>；建议用官方 <code>dp pretrained</code> 与官方 Agent Skill（<code>deepmd-finetune-dpa4</code>）生成训练输入，不手写 key。</li>
+                  <li>小数据微调存在<strong>遗忘风险</strong>，因此必须保留微调前的 committee 对照，并在微调后做同起点复验。</li>
+                  <li>训练/验证损失只是必要条件：最终判据仍是阶段 2 + 阶段 3 的全套判据在新模型上重跑一遍。</li>
+                </ul>
+                <div class="warn">
+                  <strong>不预设数字。</strong>文献给出约 170 个 PBE+U 标签、约 0.5 meV/atom 与约 30 meV/Å 的锚点，但那是 NiO 体系。
+                  本体系（非晶 Li₃PO₄ / 层状氧化物界面）在文献中尚属空白，唯一可用的预期来自本项目自己的标定结果。
+                </div>
+              </div>
+            </details>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 09 阶段 5/6 ===== -->
+    <section class="section alt" id="p56">
+      <div class="wrap">
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge final">阶段 5 / 6</span>
+            <h3>复验与稳定性</h3>
+            <span class="phase-meta">阶段 5 必做 · 阶段 6 按需</span>
+          </div>
+          <div class="step-body" style="border-top:none;padding-top:6px">
+            <p>
+              <strong>阶段 5</strong>：用微调后的模型重跑阶段 1 → 2 → 3 全链，且必须使用与旧模型完全相同的初始结构与 INPUT，否则无法归因。
+              只有全套判据通过，才允许进入阶段 7。
+            </p>
+            <p>
+              <strong>阶段 6（可选）</strong>：仅当阶段 7 需要"结构在有限温度下是否保持"的证据时，才做短 MD（ML 侧即可，如 300 K、数十 ps，观察界面是否重构）。
+              不得用短 MD 结果推导循环寿命或扩散系数。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 10 阶段 7 ===== -->
+    <section class="section" id="p7">
+      <div class="wrap">
+        <div class="phase">
+          <div class="phase-head">
+            <span class="phase-badge final">阶段 7</span>
+            <h3>性质计算</h3>
+            <span class="phase-meta">3-5 天 · DFT 单点 5-10 个 · 仅验收通过后</span>
+          </div>
+          <div class="step-body" style="border-top:none;padding-top:6px">
+            <p>对验收通过的结构计算：界面 SCF（阈值可收紧到 1e-7）、差分电荷密度（界面 − LRM 片段 − LPO 片段）、平面平均电荷、DOS / PDOS、结合能。全部沿用冻结基线，仅阈值按需调整并记录。</p>
+            <div class="note">
+              <strong>报告边界</strong>：可以写"当前验收结构上的电荷重排与电子态调制"。
+              不得仅凭这些静态量推导 Li⁺ 扩散系数、阻抗、循环寿命或完整包覆层行为——那需要 MD 或更大尺度模拟。
+              另外，Bader 分析前必须先做价电子校验。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 11 成本 ===== -->
+    <section class="section alt" id="cost">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="sec-num">11 / COST</span>
+          <h2>成本与路径</h2>
+          <p>成本以可测量表达：离子步数 × 每步 SCF 迭代数（实测双峰 40 / 180+）。三条路径的区别在于"用哪个判据决定去向"。</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:16%">路径</th><th style="width:22%">阶段</th><th style="width:32%">DFT 成本</th><th style="width:30%">出口判据</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="k">路径 A<br>直接通过</td>
+                <td class="num">0→1→2→3→7</td>
+                <td>0.3 标定所需标签（优先复用）+ 阶段 3 的 3-10 个离子步 + 阶段 7 的 5-10 个单点</td>
+                <td class="pass">3.3 全套判据通过</td>
+              </tr>
+              <tr>
+                <td class="k">路径 B<br>定向微调</td>
+                <td class="num">0→1→2→3→4→5→7</td>
+                <td>路径 A + 标签生成（界面帧优先，10² 量级离子步，按双峰成本计价）</td>
+                <td class="pass">新模型复验后全套判据通过</td>
+              </tr>
+              <tr>
+                <td class="k">路径 C<br>主动学习多轮</td>
+                <td class="num">0→1→2→3→4(多轮)→5→7</td>
+                <td>路径 B × 轮数；每轮 = 一批 DFT 标签 + 一次重训 + 一次复验</td>
+                <td class="mid">committee 偏差不再增长且验收通过；否则承认当前精度并写明边界</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ===== 工具：成本估算器 ===== -->
+        <div class="tool" id="cost-calc">
+          <div class="tool-head">
+            <span class="tool-badge">交互工具</span>
+            <h3>成本估算器</h3>
+            <p>按"离子步 × SCF 迭代 × 单次迭代墙钟 × 核数"估算一次 DFT 验收的核时。默认值是示例，请用本项目的实测值替换。</p>
+          </div>
+          <div class="tool-grid">
+            <label>离子步数
+              <input type="number" id="cSteps" value="5" step="1" min="1">
+            </label>
+            <label>平均每步 SCF 迭代数
+              <input type="number" id="cIters" value="40" step="1" min="1">
+            </label>
+            <label>单次迭代墙钟（秒）
+              <input type="number" id="cSec" value="6" step="0.5" min="0.1">
+            </label>
+            <label>并行核数
+              <input type="number" id="cCores" value="48" step="1" min="1">
+            </label>
+          </div>
+          <div class="readout">
+            <div><b>单步核时</b><span id="oStep">—</span></div>
+            <div><b>本次验收总核时</b><span id="oTotal">—</span></div>
+            <div><b>悲观情形（180 迭代）</b><span id="oBad">—</span></div>
+            <div><b>纯 DFT 跑到 100 步</b><span id="oPure">—</span></div>
+          </div>
+          <p class="tool-note">公式：核时 = 离子步数 × 每步迭代数 × 单次迭代墙钟 × 核数 ÷ 3600。"纯 DFT 跑到 100 步"用于对照——这是没有 ML 预优化时的量级。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 12 风险 ===== -->
+    <section class="section" id="risk">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="sec-num">12 / RISK</span>
+          <h2>风险与回退</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:26%">风险</th><th style="width:34%">早期信号</th><th style="width:40%">回退动作</th></tr></thead>
+            <tbody>
+              <tr><td class="k">DFT 设置未收敛，判据失效</td><td>0.2 抽查中截断能 / K 点变化引起 max|F| 变化 &gt; 0.01 eV/Å</td><td>先冻结新设置并重跑 0.3 标定，再谈模型精度</td></tr>
+              <tr><td class="k">模型落在 PBE / PBE+U 混合势能面的错误一侧</td><td>TM 上的力 MAE 显著高于 O；层间距被"虚假排斥"推大</td><td>按 B3 处理：标签只沿 DFT+U 路径生成；必要时启用自旋并补对应标签</td></tr>
+              <tr><td class="k">初始结构本身有缺陷（7/12 个 P 三配位）</td><td>0.4 闸门显示 P 配位异常集中在界面</td><td>提交"接受现状 vs 先修结构"的决策，不默认其一</td></tr>
+              <tr><td class="k">固定底层 48 原子 + 面内失配产生假力</td><td>固定层附近力始终偏大且不随弛豫下降</td><td>做固定层厚度与应变分配的收敛检查；必要时调整固定层或超胞匹配</td></tr>
+              <tr><td class="k">小数据微调导致遗忘</td><td>新模型在远离界面的体相区域误差反而变大</td><td>加入体相锚定帧；保留微调前模型做 committee 对照</td></tr>
+              <tr><td class="k">把平台成功当成科学收敛</td><td>任务 completed，但 SCF 未达 1e-6 或力判据未提取</td><td>平台状态只推进到"回收"，科学验收必须独立完成</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 13 确认清单 ===== -->
+    <section class="section alt" id="check">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="sec-num">13 / CONFIRM</span>
+          <h2>执行前需确认的问题</h2>
+          <p>结构、科学参数与付费提交三者都必须显式确认；缺失时不得静默选择。勾选状态会保存在本机浏览器。</p>
+        </div>
+        <div class="checklist" id="checklist">
+          <div class="checklist-progress">
+            <span id="ckCount">0 / 8</span>
+            <div class="bar"><i id="ckBar"></i></div>
+          </div>
+          <label><input type="checkbox"><span><strong>结构</strong>：以哪份结构为初始模型（当前版本 / 固定层版本 / 层间距变体）？固定层 48 个原子的范围与依据是否确认？</span></label>
+          <label><input type="checkbox"><span><strong>U 值依据</strong>：<code>hubbard_u 0 3.9 3.3 6.2 0 0</code> 与 <code>onsite_radius 3.0 Bohr</code> 来自哪里？是否确认为目标势能面的定义？</span></label>
+          <label><input type="checkbox"><span><strong>数值设置</strong>：是否认可 <code>KPT 1×3×2</code>、<code>ecutwfc 100</code>、<code>scf_thr 1e-6</code>？是否安排 0.2 的收敛抽查，还是直接沿用历史结论？</span></label>
+          <label><input type="checkbox"><span><strong>初始结构缺陷</strong>：接受"7/12 个 P 三配位、依赖弛豫修复"，还是先修结构（补氧 / 退火 / 换晶体 Li₃PO₄）再投入计算？</span></label>
+          <label><input type="checkbox"><span><strong>历史标签集</strong>：可用的自有 DFT 标签有哪些（路径、所用 INPUT、SCF 收敛帧数）？能否直接作为 0.3 标定的输入？</span></label>
+          <label><input type="checkbox"><span><strong>验收口径</strong>：<code>max|F| ≤ 0.05 eV/Å</code>（可动原子力模）+ <code>RMS ≤ 0.03</code> 是否足够？还是要求 ≤ 0.02 eV/Å（成本显著上升）？</span></label>
+          <label><input type="checkbox"><span><strong>资源与授权</strong>：0.2 抽查、0.3 标定、阶段 3 验收分别允许提交多少任务？每一项是否已单独授权？</span></label>
+          <label><input type="checkbox"><span><strong>最终目标</strong>：要一个可做性质计算的优化结构，还是一个可用于长时 MD 的高精度势函数？两者对标签量与微调深度的要求不同。</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 14 附录 ===== -->
+    <section class="section" id="appendix">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="sec-num">14 / APPENDIX</span>
+          <h2>附录</h2>
+          <p>脚本骨架与台账规范。参数名请先以本机 <code>-h</code> 输出核对再运行。</p>
+        </div>
+
+        <div class="phase">
+          <div class="phase-head"><span class="phase-badge">附录 A</span><h3>格式与接口约定</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:32%">场景</th><th style="width:68%">正确写法</th></tr></thead>
+              <tbody>
+                <tr><td class="k">读 STRU</td><td><code>AbacusSTRU.read("x.stru", fmt="stru").to("ase")</code><br>或 <code>dpdata.LabeledSystem("x.stru", fmt="abacus/stru").to("ase")</code></td></tr>
+                <tr><td class="k">写 STRU</td><td><code>AbacusSTRU.from_ase(atoms).write("x.stru", fmt="stru", direct=True)</code>（ASE 本身没有 STRU 写出器）</td></tr>
+                <tr><td class="k">读 ABACUS 输出</td><td><code>dpdata.LabeledSystem("OUT.ABACUS", fmt="abacus/md")</code>；SCF → <code>abacus/scf</code>，弛豫 → <code>abacus/relax</code></td></tr>
+                <tr><td class="k">模型误差统计</td><td>先转 DeePMD 系统，再 <code>dp test -m m.pt -s dp_sys -n 50 -d detail.txt</code>；<br>无标签帧用 <code>DeepPot.eval()</code> 直接推理（<code>dp test</code> 的统计需要标签）</td></tr>
+                <tr><td class="k">跨模型偏差</td><td><code>dp model-devi -m a.pt b.pt -s sys -n N -o devi.out</code></td></tr>
+                <tr><td class="k">数值精度</td><td>保持默认 float32；混合精度用模型侧 <code>descriptor.use_amp</code>，不用环境变量</td></tr>
+                <tr><td class="k">固定原子</td><td>从 STRU 的 <code>m 0 0 0</code> 标记导出 <code>fixed_atoms.txt</code>，并断言与 <code>FixAtoms</code> 一致</td></tr>
+                <tr><td class="k">判据口径</td><td>统一为力的模 <code>max|F|</code> + <code>RMS(F)</code>，并声明固定原子不参与</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-head"><span class="phase-badge">附录 B</span><h3>台账与证据规范</h3></div>
+          <div class="step-body" style="border-top:none;padding-top:6px">
+            <ul>
+              <li>每个任务一个独立目录，命名 <code>&lt;目的&gt;_&lt;模型或设置&gt;_&lt;YYYYMMDD&gt;</code>；</li>
+              <li>目录内固定保留 <code>run_id.txt</code>、<code>input_manifest.json</code>（含各输入文件 sha256）、<code>analysis.json</code>、<code>README</code>（改了什么、为什么）；</li>
+              <li>重算不覆盖：新建尝试并记录父任务、参数差异与授权范围；</li>
+              <li>模型与结构一律记哈希，不只记文件名；</li>
+              <li>平台 <code>completed</code> 只表示可以回收，不等于科学验收通过；SCF 残差、力判据、几何判据必须独立提取。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      LRM × Li₃PO₄ 界面 MLIP → DFT 执行流程 · v3.2<br>
+      依据项目实际产物编制：<code>fire_progress_probe_288_20261025</code> · <code>LRM_LPO_DPA4Air_preopt_20261028</code> · <code>LRM_LPO_DPA4_preopt_288_fix2_20261027</code> · <code>文献调研_MLIP加速LRM-LPO界面弛豫技术难点_20261029.md</code> · <code>结构审查报告.md</code><br>
+      外部参考：
+      <a href="https://docs.deepmodeling.com/projects/deepmd/en/latest/model/dpa4.html" target="_blank" rel="noopener">DeePMD DPA4 文档</a> ·
+      <a href="https://docs.deepmodeling.com/projects/deepmd/en/stable/model/pretrained.html" target="_blank" rel="noopener">dp pretrained</a> ·
+      <a href="https://github.com/deepmodeling/deepmd-kit/discussions/4090" target="_blank" rel="noopener">ASE ↔ DeepMD 能量平移讨论</a><br>
+      本文件为流程规格，不构成任何付费计算授权。
+    </div>
+  </footer>
+</div>
+
+<button class="to-top" id="toTop" aria-label="返回顶部">↑</button>
+
+<script>
+(function () {
+  "use strict";
+
+  var $  = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* ---------- 主题 ---------- */
+  var themeBtn = $("#themeBtn");
+  var THEME_KEY = "lrm_lpo_execution_v3_2_theme";
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+    if (themeBtn) themeBtn.textContent = t === "dark" ? "☀" : "◐";
+  }
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem(THEME_KEY); } catch (e) {}
+  if (!savedTheme) {
+    savedTheme = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  }
+  applyTheme(savedTheme);
+  if (themeBtn) {
+    themeBtn.addEventListener("click", function () {
+      var cur = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      applyTheme(cur);
+    });
+  }
+
+  /* ---------- 移动端抽屉 ---------- */
+  var sidebar = $("#sidebar"), backdrop = $("#backdrop"), menuBtn = $("#menuBtn");
+  function closeDrawer() { sidebar.classList.remove("open"); }
+  if (menuBtn) menuBtn.addEventListener("click", function () { sidebar.classList.toggle("open"); });
+  if (backdrop) backdrop.addEventListener("click", closeDrawer);
+
+  /* ---------- 目录分组折叠 ---------- */
+  $$(".toc-group-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var g = btn.parentNode;
+      g.setAttribute("data-open", g.getAttribute("data-open") === "0" ? "1" : "0");
+    });
+  });
+
+  /* ---------- 目录搜索 ---------- */
+  var searchInput = $("#sideSearch");
+  if (searchInput) {
+    searchInput.addEventListener("input", function () {
+      var q = searchInput.value.trim().toLowerCase();
+      $$(".toc-group").forEach(function (g) {
+        var any = false;
+        $$("a", g).forEach(function (a) {
+          var hit = !q || a.textContent.toLowerCase().indexOf(q) !== -1;
+          a.style.display = hit ? "" : "none";
+          if (hit) any = true;
+        });
+        g.style.display = any ? "" : "none";
+        if (q && any) g.setAttribute("data-open", "1");
+      });
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "/" && document.activeElement !== searchInput) {
+        e.preventDefault(); searchInput.focus(); searchInput.select();
+      }
+      if (e.key === "Escape" && document.activeElement === searchInput) {
+        searchInput.value = "";
+        searchInput.dispatchEvent(new Event("input"));
+        searchInput.blur();
+      }
+    });
+  }
+
+  /* ---------- 目录链接：打开折叠祖先再滚动 ---------- */
+  var tocLinks = $$(".toc-items a");
+  function openAncestors(el) {
+    var node = el;
+    while (node && node !== document.body) {
+      if (node.tagName === "DETAILS") node.setAttribute("open", "");
+      node = node.parentNode;
+    }
+  }
+  tocLinks.forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      var id = a.getAttribute("href").slice(1);
+      var target = document.getElementById(id);
+      if (!target) return;
+      e.preventDefault();
+      openAncestors(target);
+      closeDrawer();
+      setTimeout(function () {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", "#" + id);
+      }, 30);
+    });
+  });
+
+  /* ---------- 滚动进度 + 高亮 + 面包屑 ---------- */
+  var pbar = $("#pbar"), crumb = $("#crumb"), toTop = $("#toTop");
+  var targets = tocLinks.map(function (a) {
+    return { id: a.getAttribute("href").slice(1), link: a, el: document.getElementById(a.getAttribute("href").slice(1)) };
+  }).filter(function (t) { return t.el; });
+
+  var ticking = false;
+  function update() {
+    ticking = false;
+    var doc = document.documentElement;
+    var top = window.pageYOffset || doc.scrollTop;
+    var h = doc.scrollHeight - window.innerHeight;
+    if (pbar) pbar.style.width = (h > 0 ? Math.min(100, (top / h) * 100) : 0) + "%";
+    if (toTop) toTop.classList.toggle("show", top > 500);
+
+    var line = top + 120, active = null;
+    for (var i = 0; i < targets.length; i++) {
+      var t = targets[i];
+      if (t.el.getBoundingClientRect().top + top <= line) active = t;
+    }
+    if (!active && targets.length) active = targets[0];
+    targets.forEach(function (t) { t.link.classList.toggle("active", t === active); });
+    if (active && crumb) {
+      var label = active.link.textContent.replace(/^\s*\S+\s*/, "").trim() || active.link.textContent.trim();
+      crumb.innerHTML = "<b>" + label + "</b>";
+    }
+  }
+  function onScroll() {
+    if (!ticking) { ticking = true; window.requestAnimationFrame(update); }
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  update();
+
+  if (toTop) {
+    toTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  /* ---------- 代码复制 ---------- */
+  $$(".code").forEach(function (block) {
+    var btn = document.createElement("button");
+    btn.className = "copy";
+    btn.type = "button";
+    btn.textContent = "复制";
+    btn.addEventListener("click", function () {
+      var text = block.innerText;
+      function done() {
+        btn.textContent = "已复制";
+        btn.classList.add("done");
+        setTimeout(function () { btn.textContent = "复制"; btn.classList.remove("done"); }, 1600);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+    block.appendChild(btn);
+  });
+
+  /* ---------- 全部展开 / 收起 ---------- */
+  var allSteps = $$(".step");
+  var STEP_KEY = "lrm_lpo_execution_v3_2_step_state";
+  function saveSteps() {
+    try {
+      var st = {};
+      allSteps.forEach(function (s) { st[s.id || Math.random()] = s.hasAttribute("open"); });
+      localStorage.setItem(STEP_KEY, JSON.stringify(st));
+    } catch (e) {}
+  }
+  allSteps.forEach(function (s) { s.addEventListener("toggle", saveSteps); });
+  try {
+    var st = JSON.parse(localStorage.getItem(STEP_KEY) || "{}");
+    allSteps.forEach(function (s) { if (s.id && st[s.id] === false) s.removeAttribute("open"); });
+  } catch (e) {}
+
+  var expandAll = $("#expandAll"), collapseAll = $("#collapseAll");
+  if (expandAll) expandAll.addEventListener("click", function () { allSteps.forEach(function (s) { s.setAttribute("open", ""); }); });
+  if (collapseAll) collapseAll.addEventListener("click", function () { allSteps.forEach(function (s) { s.removeAttribute("open"); }); });
+
+  /* ---------- 工具一：验收判定器 ---------- */
+  var inMaxF = $("#inMaxF"), inRms = $("#inRms"), inMag = $("#inMag");
+  var ckPO4 = $("#ckPO4"), ckShort = $("#ckShort"), ckScf = $("#ckScf");
+  var verdict = $("#verdict");
+
+  function judge() {
+    if (!verdict) return;
+    var f = parseFloat(inMaxF.value), r = parseFloat(inRms.value), m = parseFloat(inMag.value);
+    if (isNaN(f)) f = 0;
+    if (isNaN(r)) r = 0;
+    if (isNaN(m)) m = 0;
+
+    var fails = [];
+    if (f > 0.05) fails.push("max|F| = " + f.toFixed(3) + " 超过 0.05 eV/Å");
+    if (r > 0.03) fails.push("RMS = " + r.toFixed(3) + " 超过 0.03 eV/Å");
+    if (m > 0.5) fails.push("磁矩变化 " + m.toFixed(2) + " μB 超过 0.5 μB");
+    if (!ckScf.checked)  fails.push("SCF 未收敛或能量/磁矩历史有跳变");
+    if (!ckPO4.checked)  fails.push("PO₄ 不完整（存在 P–O 键长 ≥ 1.7 Å）");
+    if (!ckShort.checked) fails.push("存在异常短接触");
+
+    var pass = fails.length === 0;
+    verdict.className = "verdict " + (pass ? "pass" : "fail");
+    if (pass) {
+      verdict.innerHTML = '<span class="big">PASS</span><span>全套判据通过，可进入阶段 7。</span>';
+    } else {
+      verdict.innerHTML = '<span class="big">FAIL</span><div><span>未通过项：</span><ul>' +
+        fails.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul></div>";
+    }
+  }
+  [inMaxF, inRms, inMag].forEach(function (el) { if (el) el.addEventListener("input", judge); });
+  [ckPO4, ckShort, ckScf].forEach(function (el) { if (el) el.addEventListener("change", judge); });
+  judge();
+
+  /* ---------- 工具二：成本估算器 ---------- */
+  var cSteps = $("#cSteps"), cIters = $("#cIters"), cSec = $("#cSec"), cCores = $("#cCores");
+  var oStep = $("#oStep"), oTotal = $("#oTotal"), oBad = $("#oBad"), oPure = $("#oPure");
+
+  function fmt(x) {
+    if (x >= 1000) return (x / 1000).toFixed(1) + " k 核时";
+    return x.toFixed(x < 10 ? 2 : 0) + " 核时";
+  }
+  function calcCost() {
+    var steps = parseFloat(cSteps.value) || 0;
+    var iters = parseFloat(cIters.value) || 0;
+    var sec   = parseFloat(cSec.value) || 0;
+    var cores = parseFloat(cCores.value) || 0;
+    var perStep = iters * sec * cores / 3600;
+    if (oStep)  oStep.textContent  = fmt(perStep);
+    if (oTotal) oTotal.textContent = fmt(perStep * steps);
+    if (oBad)   oBad.textContent   = fmt(180 * sec * cores / 3600 * steps);
+    if (oPure)  oPure.textContent  = fmt(iters * sec * cores / 3600 * 100);
+  }
+  [cSteps, cIters, cSec, cCores].forEach(function (el) { if (el) el.addEventListener("input", calcCost); });
+  calcCost();
+
+  /* ---------- 确认清单计数 ---------- */
+  var ckItems = $$("#checklist input[type=checkbox]");
+  var ckCount = $("#ckCount"), ckBar = $("#ckBar");
+  var CK_KEY = "lrm_lpo_confirm_v32";
+
+  function refreshChecklist(save) {
+    var n = ckItems.filter(function (c) { return c.checked; }).length;
+    if (ckCount) ckCount.textContent = n + " / " + ckItems.length;
+    if (ckBar) ckBar.style.width = (ckItems.length ? (n / ckItems.length) * 100 : 0) + "%";
+    ckItems.forEach(function (c) { c.parentNode.classList.toggle("checked", c.checked); });
+    if (save) {
+      try { localStorage.setItem(CK_KEY, JSON.stringify(ckItems.map(function (c) { return c.checked; }))); } catch (e) {}
+    }
+  }
+  try {
+    var savedCk = JSON.parse(localStorage.getItem(CK_KEY) || "[]");
+    ckItems.forEach(function (c, i) { if (savedCk[i]) c.checked = true; });
+  } catch (e) {}
+  ckItems.forEach(function (c) { c.addEventListener("change", function () { refreshChecklist(true); }); });
+  refreshChecklist(false);
+
+  /* ---------- 初次打开时展开默认步骤 ---------- */
+  onScroll();
+})();
+</script>
+</body>
+</html>
